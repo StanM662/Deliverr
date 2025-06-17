@@ -1,0 +1,17 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deliverr.WelkomPagina"
+             xmlns:viewmodel="clr-namespace:Deliverr.ViewModels">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30,0" Spacing="25">
+
+            <Image Source="zuyd_logo.png" HeightRequest="185" Aspect="AspectFit" />
+
+            <Label Text="Welkom bij de bestelapp" Style="{StaticResource Headline}" />
+            <Label Text="Deze mobiele applicatie is gemaakt door:&#10;Stan Morreau&#10;Sander Kleijnen&#10;Rick Theunisz"
+                   Style="{StaticResource SubHeadline}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

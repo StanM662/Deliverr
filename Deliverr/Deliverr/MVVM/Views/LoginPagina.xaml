@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Deliverr.LoginPagina">
+    
+    <VerticalStackLayout>
+        <Label Padding="20" Text="U bent niet ingelogd. Wilt u inloggen?" VerticalOptions="Center" HorizontalOptions="Center" />
+        <VerticalStackLayout Spacing="10" Padding="20">
+            <Label Text="Gebruikersnaam" />
+            <Entry Placeholder="Typ hier..." Text="{Binding Name}" WidthRequest="250" HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Spacing="10" Padding="20">
+            <Label Text="Wachtwoord" />
+            <Entry Placeholder="Typ hier..." Text="{Binding Password}" WidthRequest="250" HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <Frame BackgroundColor="LightSkyBlue"
+       Padding="20"
+       WidthRequest="200"
+       HorizontalOptions="Center"
+       HasShadow="True">
+
+            <Grid>
+                <Label Text="Inloggen"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               TextColor="White" />
+            </Grid>
+
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer
+                    Command="{Binding InloggenCommand}"/>
+
+            </Frame.GestureRecognizers>
+        </Frame>
+
+
+    </VerticalStackLayout>
+
+</ContentPage>
