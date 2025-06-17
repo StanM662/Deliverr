@@ -1,0 +1,14 @@
+# Build and IDE artifacts
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+
+# Output and debug files
+*.apk
+*.db
+*.pdb
+*.DS_Store
+
+
