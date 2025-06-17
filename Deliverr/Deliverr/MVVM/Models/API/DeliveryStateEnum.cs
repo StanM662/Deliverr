@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Deliverr.Models;
+﻿using Deliverr.Models;
 namespace Deliverr.Models;
 
-public partial class DeliveryStateEnum
+public enum DeliveryStatesEnum
 {
-    public enum DeliveryStates
-    {
-        Pending,
-        Shipped,
-        Delivered,
-        Cancelled
-    }
-
+    Pending = 1,
+    Shipping = 2,
+    Delivered = 3,
+    Cancelled = 4
 }
+
+

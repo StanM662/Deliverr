@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Deliverr.Models;
+
 namespace Deliverr.Models;
 
-public partial class DeliveryState
+public class DeliveryState
 {
-    public int id;
-    public DeliveryStateEnum state;
-    public string dateTime;
-    public int orderId;
-    public Order order;
-    public int deliveryServiceId;
-    public DeliveryService deliveryService;
-
+    public int Id { get; set; }
+    public int State { get; set; }
+    public DateTime DateTime { get; set; }
+    public int OrderId { get; set; }
+    public Order Order { get; set; }
+    public int DeliveryServiceId { get; set; }
+    public DeliveryService DeliveryService { get; set; }
 }
+

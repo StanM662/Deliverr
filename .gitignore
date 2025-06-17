@@ -11,4 +11,7 @@
 *.pdb
 *.DS_Store
 
+# API key
+**/APIKey.cs
+
 

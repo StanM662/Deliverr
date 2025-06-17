@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Deliverr.Models;
-namespace Deliverr.Models;
-
-public partial class Product
+﻿namespace Deliverr.Models
 {
-    public int id;
-    public string name;
-    public string description;
-    public decimal price;
-
-
+    public class Product
+    {
+        public string Name { get; set; } = "";
+        public int Quantity { get; set; }
+    }
 }

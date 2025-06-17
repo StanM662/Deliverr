@@ -1,19 +1,67 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              x:Class="Deliverr.BestellingPagina"
+             x:Name="BestellingPage"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:Deliverr.ViewModels">
 
-    <!-- BindingContext niet meer hier instellen -->
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout Padding="10" Spacing="20">
 
-    <CollectionView ItemsSource="{Binding Bestellingen}">
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <VerticalStackLayout>
-                    <Label Text="{Binding ProductNaam}" FontAttributes="Bold" />
-                    <Label Text="{Binding Aantal}" />
-                    <Label Text="{Binding Datum}" />
-                </VerticalStackLayout>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+                <Label Text="Orders" FontSize="20" FontAttributes="Bold" />
+
+                <Label Text="Loading..." FontAttributes="Bold" FontSize="20"
+                       HorizontalOptions="Center" IsVisible="{Binding IsLoading}" />
+
+                <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                   IsVisible="{Binding IsLoading}" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center" 
+                                   Color="DarkGray" />
+
+                <CollectionView ItemsSource="{Binding Orders}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BorderColor="LightGray" CornerRadius="5" Padding="10" Margin="10">
+                                <VerticalStackLayout>
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="Order" FontAttributes="Bold" FontSize="20"/>
+                                        <Label Text="{Binding Id}" FontAttributes="Bold" FontSize="20"/>
+                                    </HorizontalStackLayout>
+
+                                    <Label Text="Order Date:" FontAttributes="Bold" />
+                                    <Label Text="{Binding OrderDate}" />
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="Customer ID:" FontAttributes="Bold" />
+                                        <Label Text="{Binding CustomerId}" />
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Button Text="Start" 
+                                                Command="{Binding BindingContext.StartDeliveryCommand, Source={x:Reference BestellingPage}}"
+                                                CommandParameter="{Binding .}" />
+
+                                        <Button Text="Update" 
+                                                Command="{Binding BindingContext.UpdateDeliveryCommand, Source={x:Reference BestellingPage}}"
+                                                CommandParameter="{Binding .}" />
+
+                                        <Button Text="Complete" 
+                                                Command="{Binding BindingContext.CompleteDeliveryCommand, Source={x:Reference BestellingPage}}"
+                                                CommandParameter="{Binding .}" />
+
+                                        <Button Text="Cancel" 
+                                                Command="{Binding BindingContext.CancelDeliveryCommand, Source={x:Reference BestellingPage}}"
+                                                CommandParameter="{Binding .}" />
+                                    </HorizontalStackLayout>
+
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
 </ContentPage>

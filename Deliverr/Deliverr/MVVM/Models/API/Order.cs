@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Deliverr.Models;
+
 namespace Deliverr.Models;
 
-public partial class Order
+public class Order
 {
-    public int id;
-    public string orderDate;
-    public int customerId;
-    public Customer customer;
-    public List<Product> products;
+    public int Id { get; set; }
+    public DateTime OrderDate { get; set; }
+    public int CustomerId { get; set; }
+    public Customer Customer { get; set; }
+    public List<Product> Products { get; set; }
+    public List<DeliveryState> DeliveryStates { get; set; }
 }

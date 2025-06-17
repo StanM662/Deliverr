@@ -1,21 +1,24 @@
 using Deliverr.ViewModels;
-namespace Deliverr;
+using Microsoft.Maui.Controls;
 
-public partial class BestellingPagina : ContentPage
+namespace Deliverr
 {
-    public BestellingPagina()
+    public partial class BestellingPagina : ContentPage
     {
-        InitializeComponent();
-        BindingContext = new BestellingenViewModel();
-    }
+        private BestellingenViewModel vm;
 
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-
-        if (BindingContext is BestellingenViewModel vm)
+        public BestellingPagina()
         {
-            await vm.LoadBestellingenAsync();
+            InitializeComponent();
+            vm = new BestellingenViewModel();
+            BindingContext = vm;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            await vm.LoadOrdersAsync();
         }
     }
 }
