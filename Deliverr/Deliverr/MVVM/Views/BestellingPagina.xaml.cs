@@ -3,9 +3,19 @@ namespace Deliverr;
 
 public partial class BestellingPagina : ContentPage
 {
-    public BestellingPagina(PageViewModel vm)
+    public BestellingPagina()
     {
         InitializeComponent();
-        BindingContext = vm;
+        BindingContext = new BestellingenViewModel();
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is BestellingenViewModel vm)
+        {
+            await vm.LoadBestellingenAsync();
+        }
     }
 }

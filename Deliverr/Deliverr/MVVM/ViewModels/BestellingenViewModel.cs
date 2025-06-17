@@ -1,9 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Deliverr.Models;
-using Deliverr.ViewModels;
-
-namespace Deliverr.ViewModels;
 public class BestellingenViewModel : INotifyPropertyChanged
 {
     private readonly ApiService _apiService = new ApiService();
@@ -21,12 +18,12 @@ public class BestellingenViewModel : INotifyPropertyChanged
 
     public BestellingenViewModel()
     {
-        LoadBestellingen();
+        // We laden nu niet direct hier, maar in de pagina OnAppearing
     }
 
-    private async void LoadBestellingen()
+    public async Task LoadBestellingenAsync()
     {
-        var list = await _apiService.GetBestellingenAsync();
+        var list = await _apiService.GetOrdersAsync();
         Bestellingen = new ObservableCollection<Order>(list);
     }
 
