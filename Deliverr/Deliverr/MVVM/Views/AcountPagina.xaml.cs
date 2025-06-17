@@ -1,29 +1,31 @@
 using Deliverr.Models;  
 using Deliverr.ViewModels;
 
-namespace Deliverr;
-
-public partial class AccountPagina : ContentPage
+namespace Deliverr
 {
-    public AccountPagina()
+    public partial class AccountPagina : ContentPage
     {
-        InitializeComponent();
-    }
-
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        Account account = UserSession.LoggedInAccount ?? new Account()
+        public AccountPagina()
         {
-            Username = "Gast",
-            Details = "",
-            Email = "",
-            ProfilePicture = new Image { Source = "zuyd_logo.png" },
+            InitializeComponent();
+        }
 
-        };
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
 
-        var viewModel = new AccountViewModel(account);
-        BindingContext = viewModel;
-        AccountLabel.Text = $"Welkom {viewModel.Naam}!";
+            Account account = UserSession.LoggedInAccount ?? new Account
+            {
+                Username = "Gast",
+                Password = "",
+                Details = "",
+                Email = "",
+                ProfilePicture = new Image { Source = "zuyd_logo.png" }
+            };
+
+            var viewModel = new AccountViewModel(account);
+            BindingContext = viewModel;
+
+        }
     }
 }

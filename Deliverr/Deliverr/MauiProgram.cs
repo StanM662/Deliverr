@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Deliverr.ViewModels;
-using Microsoft.Maui.LifecycleEvents;
+
 
 namespace Deliverr;
 

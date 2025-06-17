@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Deliverr.Models;
 namespace Deliverr.Models;
 
-public static class UserSession
+public partial class Customer
 {
-    public static string LoggedInUser { get; set; }
-    public static Account LoggedInAccount { get; set; }
+    public int id;
+    public string name;
+    public string adress;
+    public bool active;
 }
-

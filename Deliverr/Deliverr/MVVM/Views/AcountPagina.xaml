@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deliverr.AccountPagina"
              Title="Account">
-    
+
     <VerticalStackLayout>
         <VerticalStackLayout HorizontalOptions="Center" Padding="25">
             <Image Source="{Binding ProfilePicture.Source}" HeightRequest="150" Aspect="AspectFit" />
-            <Label x:Name="AccountLabel" Text="{Binding Naam}" FontSize="36"/>
+            <Label Text="{Binding Naam, StringFormat='Welkom {0}!'}" FontSize="36" />
             <Label Text="{Binding Details}" FontSize="24"/>
             <Label Text="{Binding Email}" FontSize="18"/>
 

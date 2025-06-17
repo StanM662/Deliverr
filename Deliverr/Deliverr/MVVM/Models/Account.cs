@@ -1,5 +1,4 @@
 ﻿using Microsoft.Maui.Controls;
-
 namespace Deliverr.Models;
 public partial class Account
 {
@@ -8,8 +7,6 @@ public partial class Account
     public string Details { get; set; }
     public string Email { get; set; }
     public Image ProfilePicture { get; set; }
-    public Account() { }
-
     public Account(string username, string password, string details, string email, Image profilePicture)
     {
         Username = username;
@@ -18,4 +15,10 @@ public partial class Account
         Email = email;
         ProfilePicture = profilePicture;
     }
+
+    public Account()
+    {
+
+    }
+
 }
