@@ -1,157 +1,125 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Deliverr.Models;
-using Microsoft.Maui.Controls;
+﻿using System.Collections.ObjectModel;                                                   // Voor het gebruiken van een dynamische lijst die meldingen stuurt bij veranderingen       //
+using System.ComponentModel;                                                            // Voor het implementeren van INotifyPropertyChanged (databinding support)                  //
+using System.Windows.Input;                                                             // Voor ICommand (voor binding van knoppen aan methodes)                                    //
+using Deliverr.Models;                                                                  // Voor toegang tot de Order klasse en andere modellen                                      //
+namespace Deliverr.ViewModels;                                                          // Namespace voor ViewModels binnen het Deliverr project                                    //
+public class BestellingenViewModel : INotifyPropertyChanged                             // ViewModel voor het beheren van bestellingen in de UI                                     //
+{                                                                                       //                                                                                          //
+    private readonly ApiService _apiService = new ApiService();                         // Instantie van de ApiService om data op te halen en te verzenden                          //
+    private ObservableCollection<Order> _orders = new();                                // Verzameling van bestellingen die in de UI weergegeven wordt                              //
+    private bool _isLoading;                                                            // Geeft aan of er op dit moment data geladen wordt                                         //
 
-namespace Deliverr.ViewModels
-{
-    public class BestellingenViewModel : INotifyPropertyChanged
-    {
-        private readonly ApiService _apiService = new ApiService();
+    public ObservableCollection<Order> Orders                                           // Publieke eigenschap voor binding van de bestellingen in de UI                            //
+    {                                                                                   //                                                                                          //
+        get => _orders;                                                                 // Geeft de huidige lijst terug                                                             //
+        set                                                                             //                                                                                          //
+        {                                                                               //                                                                                          //
+            if (_orders != value)                                                       // Alleen wijzigen als de nieuwe waarde anders is                                           //
+            {                                                                           //                                                                                          //
+                _orders = value;                                                        // Wijzig de interne waarde                                                                 //
+                OnPropertyChanged(nameof(Orders));                                      // Informeer de UI dat de waarde is aangepast                                               //
+            }                                                                           //                                                                                          //
+        }                                                                               //                                                                                          //
+    }                                                                                   //                                                                                          //
 
-        private ObservableCollection<Order> _orders = new();
-        private bool _isLoading;
+    public bool IsLoading                                                               // Publieke eigenschap om te tonen of data geladen wordt                                    //
+    {                                                                                   //                                                                                          //
+        get => _isLoading;                                                              // Geeft de huidige status terug                                                            //
+        set                                                                             //                                                                                          //
+        {                                                                               //                                                                                          //
+            if (_isLoading != value)                                                    // Alleen wijzigen als de waarde anders is                                                  //
+            {                                                                           //                                                                                          //
+                _isLoading = value;                                                     // Wijzig de interne waarde                                                                 //
+                OnPropertyChanged(nameof(IsLoading));                                   // Informeer de UI dat de waarde is aangepast                                               //
+            }                                                                           //                                                                                          //
+        }                                                                               //                                                                                          //
+    }                                                                                   //                                                                                          //
 
-        public ObservableCollection<Order> Orders
-        {
-            get => _orders;
-            set
-            {
-                if (_orders != value)
-                {
-                    _orders = value;
-                    OnPropertyChanged(nameof(Orders));
-                }
-            }
-        }
+    public ICommand StartDeliveryCommand { get; }                                       // Command voor het starten van een levering                                                //
+    public ICommand CompleteDeliveryCommand { get; }                                    // Command voor het voltooien van een levering                                              //
 
-        public bool IsLoading
-        {
-            get => _isLoading;
-            set
-            {
-                if (_isLoading != value)
-                {
-                    _isLoading = value;
-                    OnPropertyChanged(nameof(IsLoading));
-                }
-            }
-        }
+    public BestellingenViewModel()                                                      // Constructor van de ViewModel                                                             //
+    {                                                                                   //                                                                                          //
+        StartDeliveryCommand = new Command<Order>(async order =>                        // Initialiseer StartDeliveryCommand met async lambda                                       //
+            await StartDelivery(order));                                                //                                                                                          //
+        CompleteDeliveryCommand = new Command<Order>(async order =>                     // Initialiseer CompleteDeliveryCommand met async lambda                                    //
+            await CompleteDelivery(order));                                             //                                                                                          //
+    }                                                                                   //                                                                                          //
 
-        public ICommand StartDeliveryCommand { get; }
-        public ICommand UpdateDeliveryCommand { get; }
-        public ICommand CompleteDeliveryCommand { get; }
-        public ICommand CancelDeliveryCommand { get; }
+    public async Task LoadOrdersAsync()                                                 // Laad de bestellingen van de API en update de lijst                                       //
+    {                                                                                   //                                                                                          //
+        IsLoading = true;                                                               // Zet de status op 'laden'                                                                 //
+        try                                                                             //                                                                                          //
+        {                                                                               //                                                                                          //
+            var list = await _apiService.GetOrdersAsync();                              // Haal de lijst van bestellingen op via de API                                             //
+            Orders = new ObservableCollection<Order>(list);                             // Zet de opgehaalde lijst in de ObservableCollection                                       //
+        }                                                                               //                                                                                          //
+        catch (Exception ex)                                                            //                                                                                          //
+        {                                                                               //                                                                                          //
+            Console.WriteLine("Fout bij het laden van bestellingen: " + ex.Message);    // Toon foutmelding in de console                                                           //
+        }                                                                               //                                                                                          //
+        finally                                                                         //                                                                                          //
+        {                                                                               //                                                                                          //
+            IsLoading = false;                                                          // Laden voltooid                                                                           //
+        }                                                                               //                                                                                          //
+    }                                                                                   //                                                                                          //
 
-        public BestellingenViewModel()
-        {
-            StartDeliveryCommand = new Command<Order>(async order => await StartDelivery(order));
-            UpdateDeliveryCommand = new Command<Order>(async order => await UpdateDelivery(order));
-            CompleteDeliveryCommand = new Command<Order>(async order => await CompleteDelivery(order));
-            CancelDeliveryCommand = new Command<Order>(async order => await CancelDelivery(order));
-        }
+    private async Task StartDelivery(Order order)                                       // Start de levering van een specifieke bestelling via API                                  //
+    {                                                                                   //                                                                                          //
+        if (order == null) return;                                                      // Controleer of de order null is                                                           //
+        try                                                                             //                                                                                          //
+        {                                                                               //                                                                                          //
+            var result = await _apiService.StartDelivery(order.Id);                     // Roep API aan om levering te starten                                                      //
+            if (result.IsSuccessStatusCode)                                             // Als succesvol, verfris de order                                                          //
+            {                                                                           //                                                                                          //
+                var refreshedOrder = await _apiService.GetOrderByIdAsync(order.Id);     // Haal geüpdatete order op                                                                 //
+                ReplaceOrderInCollection(refreshedOrder);                               // Vervang de oude order in de collectie met de nieuwe versie                               //
+            }                                                                           //                                                                                          //
+            else                                                                        //                                                                                          //
+            {                                                                           //                                                                                          //
+                Console.WriteLine($"Start levering mislukt: {result.ReasonPhrase}");    // Toon foutmelding in console                                                              //
+            }                                                                           //                                                                                          //
+        }                                                                               //                                                                                          //
+        catch (Exception ex)                                                            //                                                                                          //
+        {                                                                               //                                                                                          //
+            Console.WriteLine("Start levering mislukt: " + ex.Message);                 // Toon foutmelding bij exceptie                                                            //
+        }                                                                               //                                                                                          //
+    }                                                                                   //                                                                                          //
 
-        public async Task LoadOrdersAsync()
-        {
-            IsLoading = true;
-            try
-            {
-                var list = await _apiService.GetOrdersAsync();
-                Orders = new ObservableCollection<Order>(list);
-            }
-            catch (Exception ex)
-            {
-                DisplayError("Fout bij het laden van bestellingen: " + ex.Message);
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
+    private async Task CompleteDelivery(Order order)                                    // Voltooi de levering van een specifieke bestelling via API                                //
+    {                                                                                   //                                                                                          //
+        if (order == null) return;                                                      // Controleer of de order null is                                                           //
+        try                                                                             //                                                                                          //
+        {                                                                               //                                                                                          //
+            var result = await _apiService.CompleteDelivery(order.Id);                  // Roep API aan om levering te voltooien                                                    //
+            if (result.IsSuccessStatusCode)                                             // Als succesvol, verfris de order                                                          //
+            {                                                                           //                                                                                          //
+                var refreshedOrder = await _apiService.GetOrderByIdAsync(order.Id);     // Haal geüpdatete order op                                                                 //
+                ReplaceOrderInCollection(refreshedOrder);                               // Vervang de oude order in de collectie met de nieuwe versie                               //
+            }                                                                           //                                                                                          //
+            else                                                                        //                                                                                          //
+            {                                                                           //                                                                                          //
+                Console.WriteLine($"Voltooien levering mislukt: {result.ReasonPhrase}");// Toon foutmelding in console                                                              //
+            }                                                                           //                                                                                          //
+        }                                                                               //                                                                                          //
+        catch (Exception ex)                                                            //                                                                                          //
+        {                                                                               //                                                                                          //
+            Console.WriteLine("Voltooien levering mislukt: " + ex.Message);             // Toon foutmelding bij exceptie                                                            //
+        }                                                                               //                                                                                          //
+    }                                                                                   //                                                                                          //
 
-        private async Task StartDelivery(Order order)
-        {
-            if (order == null) return;
+    private void ReplaceOrderInCollection(Order updatedOrder)                           // Vervang een order in de ObservableCollection met een nieuwe versie                       //
+    {                                                                                   //                                                                                          //
+        if (updatedOrder == null) return;                                               // Controleer of de nieuwe order null is                                                    //
+        var existingOrder = Orders.FirstOrDefault(o => o.Id == updatedOrder.Id);        // Zoek de bestaande order met dezelfde ID                                                  //
+        if (existingOrder != null)                                                      // Als de bestaande order gevonden is                                                       //
+        {                                                                               //                                                                                          //
+            var index = Orders.IndexOf(existingOrder);                                  // Haal de index van de bestaande order                                                     //
+            Orders[index] = updatedOrder;                                               // Vervang de bestaande order met de nieuwe versie                                          //
+        }                                                                               //                                                                                          //
+    }                                                                                   //                                                                                          //
 
-            try
-            {
-                var updatedOrder = await _apiService.StartDelivery(order.Id);
-                //ReplaceOrderInCollection(updatedOrder);
-            }
-            catch (Exception ex)
-            {
-                DisplayError("Start levering mislukt: " + ex.Message);
-            }
-        }
-
-        private async Task CompleteDelivery(Order order)
-        {
-            if (order == null) return;
-
-            try
-            {
-                var updatedOrder = await _apiService.CompleteDelivery(order.Id);
-                ReplaceOrderInCollection(updatedOrder);
-            }
-            catch (Exception ex)
-            {
-                DisplayError("Voltooien levering mislukt: " + ex.Message);
-            }
-        }
-
-        private async Task UpdateDelivery(Order order)
-        {
-            if (order == null) return;
-
-            try
-            {
-                var updatedOrder = await _apiService.UpdateDeliveryState(order.Id, DeliveryStatesEnum.Shipping);
-                ReplaceOrderInCollection(updatedOrder);
-            }
-            catch (Exception ex)
-            {
-                DisplayError("Update levering mislukt: " + ex.Message);
-            }
-        }
-
-        private async Task CancelDelivery(Order order)
-        {
-            if (order == null) return;
-
-            try
-            {
-                var updatedOrder = await _apiService.UpdateDeliveryState(order.Id, DeliveryStatesEnum.Cancelled);
-                ReplaceOrderInCollection(updatedOrder);
-            }
-            catch (Exception ex)
-            {
-                DisplayError("Annuleren levering mislukt: " + ex.Message);
-            }
-        }
-
-        private void ReplaceOrderInCollection(Order updatedOrder)
-        {
-            if (updatedOrder == null) return;
-
-            var existingOrder = Orders.FirstOrDefault(o => o.Id == updatedOrder.Id);
-            if (existingOrder != null)
-            {
-                var index = Orders.IndexOf(existingOrder);
-                Orders[index] = updatedOrder;
-            }
-        }
-
-        private void DisplayError(string message)
-        {
-            Console.WriteLine(message);
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged(string propertyName) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-}
+    public event PropertyChangedEventHandler? PropertyChanged;                          // Event voor property changes (voor databinding)                                           //
+    protected void OnPropertyChanged(string propertyName) =>                            // Methode om het PropertyChanged event te triggeren                                        //
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));      // Notificeer listeners dat een property is veranderd                                       //
+}                                                                                       //                                                                                          //

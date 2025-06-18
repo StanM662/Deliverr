@@ -39,21 +39,19 @@
                                     </HorizontalStackLayout>
 
                                     <HorizontalStackLayout Spacing="5">
+                                        <Label Text="Status:" FontAttributes="Bold" />
+                                        <Label Text="{Binding DeliveryStatus}" />
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout Spacing="5">
                                         <Button Text="Start" 
                                                 Command="{Binding BindingContext.StartDeliveryCommand, Source={x:Reference BestellingPage}}"
-                                                CommandParameter="{Binding .}" />
-
-                                        <Button Text="Update" 
-                                                Command="{Binding BindingContext.UpdateDeliveryCommand, Source={x:Reference BestellingPage}}"
                                                 CommandParameter="{Binding .}" />
 
                                         <Button Text="Complete" 
                                                 Command="{Binding BindingContext.CompleteDeliveryCommand, Source={x:Reference BestellingPage}}"
                                                 CommandParameter="{Binding .}" />
 
-                                        <Button Text="Cancel" 
-                                                Command="{Binding BindingContext.CancelDeliveryCommand, Source={x:Reference BestellingPage}}"
-                                                CommandParameter="{Binding .}" />
                                     </HorizontalStackLayout>
 
                                 </VerticalStackLayout>

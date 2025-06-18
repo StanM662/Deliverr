@@ -5,12 +5,10 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="30,0" Spacing="25">
-
-            <Image Source="zuyd_logo.png" HeightRequest="185" Aspect="AspectFit" />
-
-            <Label Text="Welkom bij de bestelapp" Style="{StaticResource Headline}" />
-            <Label Text="Deze mobiele applicatie is gemaakt door:&#10;Stan Morreau&#10;Sander Kleijnen&#10;Rick Theunisz"
-                   Style="{StaticResource SubHeadline}" />
+            <HorizontalStackLayout Spacing="5">
+                <Label Text="Welkom bij" FontAttributes="Bold" FontSize="30"/>
+                <Label Text="Deliverr" TextColor="#FFE87C" FontAttributes="Bold" FontSize="30"/>
+            </HorizontalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>

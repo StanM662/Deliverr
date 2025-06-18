@@ -1,170 +1,89 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Deliverr.Models;
-namespace Deliverr.Models
-{
-    public class ApiService
-    {
-        private readonly HttpClient _httpClient;
-        private readonly APIKey _key = new();
+﻿using System.Text;                                                                  // Voor het encoderen van strings.                                                              //
+using System.Text.Json;                                                             // Voor het deserialiseren van JSON data.                                                       //
+namespace Deliverr.Models;                                                          // Namespace verklaring                                                                         //
 
-        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
+public class ApiService                                                             //  ApiService class, deze handelt de communicatie met de API.                                  //
+{                                                                                   //                                                                                              //
+    private readonly HttpClient _httpClient;                                        //  de HttpClient instantie die gebruikt wordt om HTTP verzoeken te doen.                       //
+    private readonly APIKey _key = new();                                           //  key voor de API, deze wordt gebruikt om de verzoeken te authenticeren.                      //
+    private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions //  _jsonOptions, deze opties worden gebruikt bij het deserialiseren van JSON data.             //
+    {                                                                               //                                                                                              //
+        PropertyNameCaseInsensitive = true                                          //  Dit zorgt ervoor dat de JSON property namen niet hoofdlettergevoelig zijn.                  //
+    };                                                                              //                                                                                              //
 
-        public ApiService()
-        {
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri("http://51.137.100.120:5000/")
-            };
+    public ApiService()                                                             //  Constructor voor de ApiService class                                                        //
+    {                                                                               //  nieuwe HttpClient instantie aanmaken en de base address instellen.                          //
+        _httpClient = new HttpClient                                                //                                                                                              //
+        {                                                                           //  BaseAddress instellen naar de API.                                                          //
+            BaseAddress = new Uri("http://51.137.100.120:5000/")                    //                                                                                              //
+        };                                                                          //                                                                                              //
+                                                                                    //                                                                                              //
+        if (!_httpClient.DefaultRequestHeaders.Contains("ApiKey"))                  //  If-statement om te kijken of de Header al een ApiKey header heeft                           //
+        {                                                                           //  Zorgt ervoor dat er niet meerdere ApiKey headers worden aangemaakt                          //
+            _httpClient.DefaultRequestHeaders.Add("ApiKey", _key.key);              //  Voegt de header toe aan de HttpClient instantie.                                            //
+        }                                                                           //                                                                                              //
+    }                                                                               //                                                                                              //
+    
+    public async Task<List<Order>> GetOrdersAsync()                                 //  GetOrdersAsync() functie: Asynchroon (dus tijdens andere processen) iets laden              //
+    {                                                                               //  Deze functie laad alle orders en laat ze zien op de BestellingenPagina                      //
+        string tab = $"/order";                                                     //  Base endpoint voor de API, dit is de tab waar de orders worden geladen.                     //
+        string func = $"";                                                          //  Aangezien alle orders worden geladen, is er geen specifieke functie nodig.                  //
+        string endpoint = $"api{tab}{func}";                                        //  Alles samengevoegd tot een endpoint string. Dit wordt gebruikt om de verbinding te maken    //
+        return await GetFromApi<List<Order>>(endpoint);                             //  Hier wordt de GetFromApi functie aangeroepen                                                //
+    }                                                                               //  Er wordt hier een Lijst van orders terug verwacht                                           //                                  
 
-            if (!_httpClient.DefaultRequestHeaders.Contains("ApiKey"))
-            {
-                _httpClient.DefaultRequestHeaders.Add("ApiKey", _key.key);
-            }
-        }
+    public async Task<Order> GetOrderByIdAsync(int id)                              //  GetOrderByIdAsync() functie: Asynchroon (dus tijdens andere processen) iets laden           //
+    {                                                                               //  Deze functie haalt een specifieke order op op basis van het order ID.                       //
+        string tab = $"/order";                                                     //  Base endpoint voor de API, dit is de tab waar het specifieke order wordt geladen.           //
+        string func = $"/{id}";                                                     //  Het Order ID van het specifieke order dat geladen moet worden                               //
+        string endpoint = $"api{tab}{func}";                                        //  Alles samengevoegd tot een endpoint string. Dit wordt gebruikt om de verbinding te maken    //
+        return await GetFromApi<Order>(endpoint);                                   //  Hier wordt de GetFromApi functie aangeroepen                                                //
+    }                                                                               //  Er wordt hier een enkele order terug verwacht                                               // 
 
-        public async Task<List<Order>> GetOrdersAsync() =>
-            await GetFromApi<List<Order>>("api/Order");
+    public async Task<HttpResponseMessage> CompleteDelivery(int orderId)            //  CompleteDelivery functie: Asynchroon (dus tijdens andere processen) iets laden              //
+    {                                                                               //  Deze functie markeert een order als voltooid voor een specifieke order.                     //
+        string tab = $"/DeliveryStates/CompleteDelivery";                           //  Base endpoint voor de API, dit is de tab waar het proces plaatsvindt.                       //
+        string func = $"?OrderId={orderId}";                                        //  Dit zorgt ervoor dat de correcte order wordt geladen d.m.v. het order ID.                   //
+        string endpoint = $"api{tab}{func}";                                        //  Alles samengevoegd tot een endpoint string. Dit wordt gebruikt om de verbinding te maken    //
+        var content = new StringContent("{}", Encoding.UTF8, "application/json");   //  Lege JSON string, dit is nodig omdat de API geen "null" accepteerd als JSON body.           //
+        var response = await _httpClient.PostAsync(endpoint, content);              //  Het antwoord van de API wordt opgeslagen in de response variabele.                          //
+        response.EnsureSuccessStatusCode();                                         //  Hier wordt gecontroleerd of de response een succesvolle statuscode heeft.                   //
+        var responseBody = await response.Content.ReadAsStringAsync();              //  Hier wordt de body van de response gelezen als een string.                                  //
+        Console.WriteLine($"Status: {response.StatusCode}");                        //  Statuscode wordt in de console weergegeven voor debugging.                                  //
+        Console.WriteLine($"Body: {responseBody}");                                 //  Body (het antwoord van de api) wordt in de console weergegeven voor debugging.              //
+        return response;                                                            //  Het antwoord wordt gereturnd                                                                //
+    }                                                                               //  Dit wordt dan gebruikt om de orderstatus op de pagina te veranderen                         //
 
-        public async Task<List<Order>> GetOrderByIdAsync(int id) =>
-            await GetFromApi<List<Order>>($"api/Order/{id}");
+    public async Task<HttpResponseMessage> StartDelivery(int orderId)               //  StartDelivery() functie: Asynchroon (dus tijdens andere processen) iets laden               //
+    {                                                                               //  Deze functie markeert een order als gestart voor een specifieke order.                      //
+        string tab = $"/DeliveryStates/StartDelivery";                              //  Base endpoint voor de API, dit is de tab waar het proces plaatsvindt.                       //
+        string func = $"?OrderId={orderId}";                                        //  Het Order ID van het specifieke order dat geladen moet worden.                              //
+        string endpoint = $"api{tab}{func}";                                        //  Alles samengevoegd tot een endpoint string. Dit wordt gebruikt om de verbinding te maken    //
+        var content = new StringContent("{}", Encoding.UTF8, "application/json");   //  Lege JSON string, dit is nodig omdat de API geen "null" accepteerd als JSON body.           //
+        var response = await _httpClient.PostAsync(endpoint, content);              //  Het antwoord van de API wordt opgeslagen in de response variabele.                          //
+        response.EnsureSuccessStatusCode();                                         //  Hier wordt gecontroleerd of de response een succesvolle statuscode heeft.                   //
+        var responseBody = await response.Content.ReadAsStringAsync();              //  Hier wordt de body van de response gelezen als een string.                                  //
+        Console.WriteLine($"Status: {response.StatusCode}");                        //  Statuscode wordt in de console weergegeven voor debugging.                                  //
+        Console.WriteLine($"Body: {responseBody}");                                 //  Body (het antwoord van de api) wordt in de console weergegeven voor debugging.              //
+        return response;                                                            //  Het antwoord wordt gereturnd                                                                //
+    }                                                                               //  Dit wordt dan gebruikt om de orderstatus op de pagina te veranderen                         //
 
-        public async Task<Order> UpdateDeliveryState(int orderId, DeliveryStatesEnum newState)
-        {
-            var orders = await GetOrderByIdAsync(orderId);
-            var order = orders.FirstOrDefault();
-            if (order == null) return null;
-
-            var deliveryService = new DeliveryService
-            {
-                Id = 1,
-                Name = "Default Service"
-            };
-
-            var deliveryState = new DeliveryState
-            {
-                Id = 0, 
-                OrderId = orderId,
-                Order = order,
-                State = (int)newState,
-                DateTime = DateTime.UtcNow,
-                DeliveryServiceId = deliveryService.Id,
-                DeliveryService = deliveryService
-            };
-
-            return await PostToApi<Order>("api/DeliveryStates/UpdateDeliveryState", deliveryState);
-        }
-
-        public async Task<Order> StartDelivery(int orderId)
-        {
-            var orders = await GetOrderByIdAsync(orderId);
-            var order = orders.FirstOrDefault();
-            if (order == null) return null;
-
-            var deliveryService = new DeliveryService
-            {
-                Id = 1,
-                Name = "Default Service"
-            };
-
-            var deliveryState = new DeliveryState
-            {
-                Id = 0,
-                OrderId = orderId,
-                Order = order,
-                State = (int)DeliveryStatesEnum.Shipping, 
-                DateTime = DateTime.UtcNow,
-                DeliveryServiceId = deliveryService.Id,
-                DeliveryService = deliveryService
-            };
-
-            return await PostToApi<Order>("api/DeliveryStates/StartDelivery", deliveryState);
-        }
-
-
-        public async Task<Order> CompleteDelivery(int orderId)
-        {
-            var orders = await GetOrderByIdAsync(orderId);
-            var order = orders.FirstOrDefault();
-            if (order == null) return null;
-
-            var deliveryService = new DeliveryService
-            {
-                Id = 1,
-                Name = "Default Service"
-            };
-
-            var deliveryState = new DeliveryState
-            {
-                Id = 0,
-                OrderId = orderId,
-                Order = order,
-                State = (int)DeliveryStatesEnum.Delivered,
-                DateTime = DateTime.UtcNow,
-                DeliveryServiceId = deliveryService.Id,
-                DeliveryService = deliveryService
-            };
-
-            return await PostToApi<Order>("api/DeliveryStates/CompleteDelivery", deliveryState);
-        }
-
-
-        private async Task<T> GetFromApi<T>(string endpoint)
-        {
-            try
-            {
-                Debug.WriteLine($"GET: {endpoint}");
-
-                var response = await _httpClient.GetAsync(endpoint);
-                response.EnsureSuccessStatusCode();
-
-                var content = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"Response: {content}");
-
-                return JsonSerializer.Deserialize<T>(content, _jsonOptions)
-                    ?? Activator.CreateInstance<T>();
-            }
-
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"GET error: {ex.Message}");
-                return Activator.CreateInstance<T>();
-            }
-        }
-
-        private async Task<T> PostToApi<T>(string endpoint, object data)
-        {
-            try
-            {
-                var json = JsonSerializer.Serialize(data, _jsonOptions);
-                Debug.WriteLine($"POST: {endpoint}");
-                Debug.WriteLine($"Payload: {json}");
-
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(endpoint, content);
-                response.EnsureSuccessStatusCode();
-
-                var responseBody = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"Response: {responseBody}");
-
-                return JsonSerializer.Deserialize<T>(responseBody, _jsonOptions)
-                    ?? Activator.CreateInstance<T>();
-            }
-
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"POST error: {ex.Message}");
-                return Activator.CreateInstance<T>();
-            }
-        }
-    }
-}
+    private async Task<Param> GetFromApi<Param>(string endpoint)                    //  GetFromApi<Param>() functie: Asynchroon (dus tijdens andere processen) iets laden           //
+    {                                                                               //  Deze functie doet een GET verzoek naar de API en retourneert een deserialized object.       //
+                                                                                    //  De <Param> is een type parameter, zodat deze functie meerdere types kan accepteren.         //
+        var responseBody = "";                                                      //  Lege string voor de content, deze wordt later gevuld met de response van de API.            //
+        try                                                                         //  Try statement om eventuele fouten tijdens het GET verzoek af te handelen.                   //
+        {                                                                           //                                                                                              //
+            Console.WriteLine($"GET: {endpoint}");                                  //  Debug output voor het endpoint dat wordt aangeroepen.                                       //
+            var response = await _httpClient.GetAsync(endpoint);                    //  Het antwoord van de API wordt opgeslagen in de response variabele.                          //
+            response.EnsureSuccessStatusCode();                                     //  Hier wordt gecontroleerd of de response een succesvolle statuscode heeft.                   //
+            responseBody = await response.Content.ReadAsStringAsync();              //  Hier wordt de body van de response gelezen als een string.                                  //
+            Console.WriteLine($"Status: {response.StatusCode}");                    //  Statuscode wordt in de console weergegeven voor debugging.                                  //
+            Console.WriteLine($"Response: {responseBody}");                         //  Body (het antwoord van de api) wordt in de console weergegeven voor debugging.              //  
+        }                                                                           //                                                                                              //
+        catch (Exception ex) { Console.WriteLine($"GET error: {ex.Message}"); }     //  Catch statement voor eventuele fouten tijdens het GET verzoek.                              //
+        if (string.IsNullOrEmpty(responseBody)) {                                   //  Als de responseBody leeg terugkomt van de API, dan wordt er een foutmelding weergegeven.    //
+            Console.WriteLine("Received empty response from API."); }               //  Er wordt gelogt dat de response leeg is.                                                    //
+        return JsonSerializer.Deserialize<Param>(responseBody, _jsonOptions);       //  Hier wordt de responseBody gedeserialized naar het type Param met de opgegeven opties.      //
+    }                                                                               //  Type Param is meegegeven (dit is <List<Order>> of <Order>) in de functieaanroep.            //
+}                                                                                   //  Dit zorgt ervoor dat de API data correct wordt omgezet naar het gewenste type.              //                                   //
