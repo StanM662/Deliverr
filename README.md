@@ -1,17 +1,26 @@
-#v1
+**Deliverr**
+A mobile delivery app built with .NET MAUI.
+Developed for the couriers of Matrix Inc.
 
-# Bezorgersapp
+**Features (Planned)**
+ Camera functionality
 
-Een mobiele bezorg-app gebouwd met .NET MAUI.  
-Voor de bezorgers van Matrix Inc.
+ GPS tracking
 
-## Functionaliteiten (planning)
-- [ ] Camerafunctionaliteit
-- [ ] GPS tracking
-- [ ] Status bijwerken
-- [ ] Pushnotificaties
+ Update delivery status
 
-## Setup
-1. Clone de repo
-2. Open `Bezorgersapp.sln` in Visual Studio
-3. Run op `Windows Machine` of Android emulator
+ Push notifications
+
+**Setup**
+Clone this repository.
+
+Open Deliverr.sln in Visual Studio.
+
+Run the project on a Windows machine or an Android emulator.
+
+**Contributors**
+Sander Kleijnen
+
+Stan Moreaux
+
+Rick Theunisz
