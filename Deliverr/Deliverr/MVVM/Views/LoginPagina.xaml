@@ -7,12 +7,13 @@
         <Label Padding="20" Text="Not signed in. Sign in now?" VerticalOptions="Center" HorizontalOptions="Center" />
         <VerticalStackLayout Spacing="10" Padding="20">
             <Label Text="Username" />
-            <Entry Placeholder="Start typing..." Text="{Binding Name}" WidthRequest="250" HorizontalOptions="Center" />
+            <Entry Placeholder="Enter your username" Text="{Binding Name}" WidthRequest="250" HorizontalOptions="Center" />
+            <Label Text="example: User123" IsVisible="{Binding IsNameRequired}" TextColor="Red" HorizontalOptions="Center" />
         </VerticalStackLayout>
 
         <VerticalStackLayout Spacing="10" Padding="20">
             <Label Text="Password" />
-            <Entry Placeholder="Start typing..." Text="{Binding Password}" WidthRequest="250" HorizontalOptions="Center" />
+            <Entry Placeholder="password123" Text="{Binding Password}" WidthRequest="250" HorizontalOptions="Center" />
         </VerticalStackLayout>
 
         <Frame BackgroundColor="LightSkyBlue"
