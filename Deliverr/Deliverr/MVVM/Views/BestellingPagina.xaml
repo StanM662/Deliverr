@@ -44,7 +44,7 @@
                                     </HorizontalStackLayout>
 
                                     <HorizontalStackLayout Spacing="5">
-                                        <Button Text="Start" 
+                                        <Button Text="Start"  
                                                 Command="{Binding BindingContext.StartDeliveryCommand, Source={x:Reference BestellingPage}}"
                                                 CommandParameter="{Binding .}" />
 

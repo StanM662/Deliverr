@@ -67,6 +67,13 @@ public class ApiService                                                         
         Console.WriteLine($"Body: {responseBody}");                                 //  Body (het antwoord van de api) wordt in de console weergegeven voor debugging.              //
         return response;                                                            //  Het antwoord wordt gereturnd                                                                //
     }                                                                               //  Dit wordt dan gebruikt om de orderstatus op de pagina te veranderen                         //
+    public async Task<List<DeliveryState>> GetDeliveryStatesAsync()                 //  GetDeliveryStatesAsync() functie: Asynchroon (dus tijdens andere processen) iets laden      //
+    {                                                                               //  Deze functie haalt alle leveringsstatussen op en retourneert ze als een lijst.              //
+        string tab = $"/DeliveryStates";                                            //  Base endpoint voor de API, dit is de tab waar de leveringsstatussen worden geladen.         //
+        string func = $"/DeliveryStates";                                           //  Aangezien alle leveringsstatussen worden geladen, is er geen specifieke functie nodig.      //
+        string endpoint = $"api{tab}{func}";                                        //  Alles samengevoegd tot een endpoint string. Dit wordt gebruikt om de verbinding te maken    //
+        return await GetFromApi<List<DeliveryState>>(endpoint);                     //  Hier wordt de GetFromApi functie aangeroepen                                                //
+    }
 
     private async Task<Param> GetFromApi<Param>(string endpoint)                    //  GetFromApi<Param>() functie: Asynchroon (dus tijdens andere processen) iets laden           //
     {                                                                               //  Deze functie doet een GET verzoek naar de API en retourneert een deserialized object.       //
