@@ -37,32 +37,40 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
 
     public ICommand StartDeliveryCommand { get; }                                       // Command voor het starten van een levering                                                //
     public ICommand CompleteDeliveryCommand { get; }                                    // Command voor het voltooien van een levering                                              //
-
     public BestellingenViewModel()                                                      // Constructor van de ViewModel                                                             //
     {                                                                                   //                                                                                          //
         StartDeliveryCommand = new Command<Order>(async order =>                        // Initialiseer StartDeliveryCommand met async lambda                                       //
             await StartDelivery(order));                                                //                                                                                          //
         CompleteDeliveryCommand = new Command<Order>(async order =>                     // Initialiseer CompleteDeliveryCommand met async lambda                                    //
             await CompleteDelivery(order));                                             //                                                                                          //
-    }                                                                                   //                                                                                          //
+    }                                                                                   //                                                                                          //                                                                                  //                                                                                          //
 
-    public async Task LoadOrdersAsync()                                                 // Laad de bestellingen van de API en update de lijst                                       //
-    {                                                                                   //                                                                                          //
-        IsLoading = true;                                                               // Zet de status op 'laden'                                                                 //
-        try                                                                             //                                                                                          //
-        {                                                                               //                                                                                          //
-            var list = await _apiService.GetOrdersAsync();                              // Haal de lijst van bestellingen op via de API                                             //
-            Orders = new ObservableCollection<Order>(list);                             // Zet de opgehaalde lijst in de ObservableCollection                                       //
-        }                                                                               //                                                                                          //
-        catch (Exception ex)                                                            //                                                                                          //
-        {                                                                               //                                                                                          //
-            Console.WriteLine("Fout bij het laden van bestellingen: " + ex.Message);    // Toon foutmelding in de console                                                           //
-        }                                                                               //                                                                                          //
-        finally                                                                         //                                                                                          //
-        {                                                                               //                                                                                          //
-            IsLoading = false;                                                          // Laden voltooid                                                                           //
-        }                                                                               //                                                                                          //
-    }                                                                                   //                                                                                          //
+    public async Task LoadOrdersAsync()
+    {
+        IsLoading = true;
+        var orderList = await _apiService.GetOrdersAsync();
+        var stateList = await _apiService.GetDeliveryStatesAsync();
+
+        for (int i = 0; i < orderList.Count; i++)
+        {
+            var order = orderList[i];
+            DeliveryState? state = i < stateList.Count ? stateList[i] : null;
+            order.DeliveryStates = new List<DeliveryState>();
+            if (state != null)
+            {
+                order.DeliveryStates.Add(state);
+            }
+            else
+            {
+                order.DeliveryStates.Add(new DeliveryState { State = 1 });
+                Orders.Add(order);
+            }
+            
+        }
+        IsLoading = false;
+    }
+
+
 
     private async Task StartDelivery(Order order)                                       // Start de levering van een specifieke bestelling via API                                  //
     {                                                                                   //                                                                                          //
@@ -82,7 +90,7 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
         }                                                                               //                                                                                          //
         catch (Exception ex)                                                            //                                                                                          //
         {                                                                               //                                                                                          //
-            Console.WriteLine("Start levering mislukt: " + ex.Message);                 // Toon foutmelding bij exceptie                                                            //
+            Console.WriteLine($"Start levering mislukt: {ex.Message}");                 // Toon foutmelding bij exceptie                                                            //
         }                                                                               //                                                                                          //
     }                                                                                   //                                                                                          //
 
@@ -104,7 +112,7 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
         }                                                                               //                                                                                          //
         catch (Exception ex)                                                            //                                                                                          //
         {                                                                               //                                                                                          //
-            Console.WriteLine("Voltooien levering mislukt: " + ex.Message);             // Toon foutmelding bij exceptie                                                            //
+            Console.WriteLine($"Voltooien levering mislukt: {ex.Message}");             // Toon foutmelding bij exceptie                                                            //
         }                                                                               //                                                                                          //
     }                                                                                   //                                                                                          //
 

@@ -1,10 +1,12 @@
 ﻿using System.Text;                                                                  // Voor het encoderen van strings.                                                              //
 using System.Text.Json;                                                             // Voor het deserialiseren van JSON data.                                                       //
+using Deliverr.ViewModels;                                                          // Voor het gebruik van de ViewModels in de applicatie.                                         //
 namespace Deliverr.Models;                                                          // Namespace verklaring                                                                         //
 
 public class ApiService                                                             //  ApiService class, deze handelt de communicatie met de API.                                  //
 {                                                                                   //                                                                                              //
     private readonly HttpClient _httpClient;                                        //  de HttpClient instantie die gebruikt wordt om HTTP verzoeken te doen.                       //
+    private readonly BestellingenViewModel bvm;                                     //  BestellingenViewModel instantie, deze wordt gebruikt om de bestellingen te beheren.         //
     private readonly APIKey _key = new();                                           //  key voor de API, deze wordt gebruikt om de verzoeken te authenticeren.                      //
     private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions //  _jsonOptions, deze opties worden gebruikt bij het deserialiseren van JSON data.             //
     {                                                                               //                                                                                              //
@@ -37,6 +39,7 @@ public class ApiService                                                         
         string tab = $"/order";                                                     //  Base endpoint voor de API, dit is de tab waar het specifieke order wordt geladen.           //
         string func = $"/{id}";                                                     //  Het Order ID van het specifieke order dat geladen moet worden                               //
         string endpoint = $"api{tab}{func}";                                        //  Alles samengevoegd tot een endpoint string. Dit wordt gebruikt om de verbinding te maken    //
+        //await bvm.GetDeliveryStates();                                            //  after updating orders, to refresh delivery states                                            //
         return await GetFromApi<Order>(endpoint);                                   //  Hier wordt de GetFromApi functie aangeroepen                                                //
     }                                                                               //  Er wordt hier een enkele order terug verwacht                                               // 
 
@@ -67,6 +70,14 @@ public class ApiService                                                         
         Console.WriteLine($"Body: {responseBody}");                                 //  Body (het antwoord van de api) wordt in de console weergegeven voor debugging.              //
         return response;                                                            //  Het antwoord wordt gereturnd                                                                //
     }                                                                               //  Dit wordt dan gebruikt om de orderstatus op de pagina te veranderen                         //
+
+    public async Task<List<DeliveryState>> GetDeliveryStatesAsync()                 //  GetDeliveryStatesAsync() functie: Asynchroon (dus tijdens andere processen) iets laden      //
+    {                                                                               //  Deze functie haalt alle leveringsstatussen op en retourneert ze als een lijst.              //
+        string tab = $"/DeliveryStates";                                            //  Base endpoint voor de API, dit is de tab waar de leveringsstatussen worden geladen.         //
+        string func = $"/DeliveryStates";                                           //  Aangezien alle leveringsstatussen worden geladen, is er geen specifieke functie nodig.      //
+        string endpoint = $"api{tab}{func}";                                        //  Alles samengevoegd tot een endpoint string. Dit wordt gebruikt om de verbinding te maken    //
+        return await GetFromApi<List<DeliveryState>>(endpoint);                     //  Hier wordt de GetFromApi functie aangeroepen                                                //
+    }                                                                               //  Er wordt hier een Lijst van leveringsstatussen terug verwacht                               //
 
     private async Task<Param> GetFromApi<Param>(string endpoint)                    //  GetFromApi<Param>() functie: Asynchroon (dus tijdens andere processen) iets laden           //
     {                                                                               //  Deze functie doet een GET verzoek naar de API en retourneert een deserialized object.       //

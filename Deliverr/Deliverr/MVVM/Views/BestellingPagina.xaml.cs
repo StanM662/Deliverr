@@ -17,7 +17,6 @@ namespace Deliverr
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-
             await vm.LoadOrdersAsync();
         }
     }
