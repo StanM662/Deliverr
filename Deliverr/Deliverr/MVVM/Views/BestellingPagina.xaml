@@ -47,12 +47,12 @@
                                         <Button Text="Start"  
                                                 Command="{Binding BindingContext.StartDeliveryCommand, Source={x:Reference BestellingPage}}"
                                                 CommandParameter="{Binding .}" 
-                                                BackgroundColor="LightGreen" />
+                                                BackgroundColor="#69c96f" />
 
                                         <Button Text="Complete" 
                                                 Command="{Binding BindingContext.CompleteDeliveryCommand, Source={x:Reference BestellingPage}}"
                                                 CommandParameter="{Binding .}"
-                                                BackgroundColor="Azure" />
+                                                BackgroundColor="#1338BE" />
 
                                     </HorizontalStackLayout>
 
