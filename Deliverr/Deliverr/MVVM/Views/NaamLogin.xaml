@@ -4,8 +4,8 @@
              x:Class="Deliverr.NaamLogin">
     
     <VerticalStackLayout>
-        <Label Padding="50" Text="Gebruikersnaam" FontSize="Large" HorizontalOptions="Center"></Label>
-        <Entry Placeholder="Typ hier je naam..."
+        <Label Padding="50" Text="Username" FontSize="Large" HorizontalOptions="Center"></Label>
+        <Entry Placeholder="Start typing..."
        Text="{Binding Name}"
        WidthRequest="250"
        HorizontalOptions="Center"
@@ -13,7 +13,7 @@
 
         <Frame BackgroundColor="LightSkyBlue" Padding="20" WidthRequest="200" HorizontalOptions="Center" HasShadow="True">
             <Grid>
-                <Label Text="Verder" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White" />
+                <Label Text="Continue" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White" />
             </Grid>
             <Frame.GestureRecognizers>
                 <TapGestureRecognizer 

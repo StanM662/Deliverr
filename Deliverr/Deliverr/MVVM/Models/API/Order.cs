@@ -21,7 +21,7 @@ public class Order
         get
         {
             if (DeliveryStates == null || !DeliveryStates.Any())
-                return "Geen status";
+                return "No Status";
 
             var latestState = DeliveryStates
                 .OrderByDescending(ds => ds.DateTime)

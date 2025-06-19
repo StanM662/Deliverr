@@ -33,7 +33,7 @@ public partial class LoginViewModel : ObservableObject
         }
         else
         {
-            await Shell.Current.DisplayAlert("Fout", "Gebruikersnaam bestaat niet", "OK");
+            await Shell.Current.DisplayAlert("Error", "Username does not exist...", "OK");
         }
     }
 
@@ -52,7 +52,7 @@ public partial class LoginViewModel : ObservableObject
         }
         else
         {
-            await Shell.Current.DisplayAlert("Fout", "Wachtwoord is onjuist", "OK");
+            await Shell.Current.DisplayAlert("Error", "Password/Username combination is incorrect...", "OK");
         }
     }
 }

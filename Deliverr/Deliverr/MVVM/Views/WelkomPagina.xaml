@@ -6,7 +6,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="30,0" Spacing="25">
             <HorizontalStackLayout Spacing="5">
-                <Label Text="Welkom bij" FontAttributes="Bold" FontSize="30"/>
+                <Label Text="Welcome to " FontAttributes="Bold" FontSize="30"/>
                 <Label Text="Deliverr" TextColor="#FFE87C" FontAttributes="Bold" FontSize="30"/>
             </HorizontalStackLayout>
 

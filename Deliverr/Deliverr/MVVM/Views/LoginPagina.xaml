@@ -4,15 +4,15 @@
              x:Class="Deliverr.LoginPagina">
     
     <VerticalStackLayout>
-        <Label Padding="20" Text="U bent niet ingelogd. Wilt u inloggen?" VerticalOptions="Center" HorizontalOptions="Center" />
+        <Label Padding="20" Text="Not signed in. Sign in now?" VerticalOptions="Center" HorizontalOptions="Center" />
         <VerticalStackLayout Spacing="10" Padding="20">
-            <Label Text="Gebruikersnaam" />
-            <Entry Placeholder="Typ hier..." Text="{Binding Name}" WidthRequest="250" HorizontalOptions="Center" />
+            <Label Text="Username" />
+            <Entry Placeholder="Start typing..." Text="{Binding Name}" WidthRequest="250" HorizontalOptions="Center" />
         </VerticalStackLayout>
 
         <VerticalStackLayout Spacing="10" Padding="20">
-            <Label Text="Wachtwoord" />
-            <Entry Placeholder="Typ hier..." Text="{Binding Password}" WidthRequest="250" HorizontalOptions="Center" />
+            <Label Text="Password" />
+            <Entry Placeholder="Start typing..." Text="{Binding Password}" WidthRequest="250" HorizontalOptions="Center" />
         </VerticalStackLayout>
 
         <Frame BackgroundColor="LightSkyBlue"
@@ -22,7 +22,7 @@
        HasShadow="True">
 
             <Grid>
-                <Label Text="Inloggen"
+                <Label Text="Sign in"
                HorizontalOptions="Center"
                VerticalOptions="Center"
                TextColor="White" />

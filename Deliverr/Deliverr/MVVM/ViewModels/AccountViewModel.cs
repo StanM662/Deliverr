@@ -6,33 +6,33 @@ namespace Deliverr.ViewModels;
 
 public class AccountViewModel : INotifyPropertyChanged
 {
-    private string naam;
-    private string details;
-    private string email;
-    private Image profilePicture;
-    private List<string> bestellingen;
+    private string user_name;
+    private string user_details;
+    private string user_email;
+    private Image user_profile_picture;
+    private List<string> user_orders;
 
-    public string Naam
+    public string Name
     {
-        get => naam;
+        get => user_name;
         set
         {
-            if (naam != value)
+            if (user_name != value)
             {
-                naam = value;
-                OnPropertyChanged(nameof(Naam));
+                user_name = value;
+                OnPropertyChanged(nameof(Name));
             }
         }
     }
 
     public string Details
     {
-        get => details;
+        get => user_details;
         set
         {
-            if (details != value)
+            if (user_details != value)
             {
-                details = value;
+                user_details = value;
                 OnPropertyChanged(nameof(Details));
             }
         }
@@ -40,12 +40,12 @@ public class AccountViewModel : INotifyPropertyChanged
 
     public string Email
     {
-        get => email;
+        get => user_email;
         set
         {
-            if (email != value)
+            if (user_email != value)
             {
-                email = value;
+                user_email = value;
                 OnPropertyChanged(nameof(Email));
             }
         }
@@ -53,26 +53,26 @@ public class AccountViewModel : INotifyPropertyChanged
 
     public Image ProfilePicture
     {
-        get => profilePicture;
+        get => user_profile_picture;
         set
         {
-            if (profilePicture != value)
+            if (user_profile_picture != value)
             {
-                profilePicture = value;
+                user_profile_picture = value;
                 OnPropertyChanged(nameof(ProfilePicture));
             }
         }
     }
 
-    public List<string> Bestellingen
+    public List<string> Orders
     {
-        get => bestellingen;
+        get => user_orders;
         set
         {
-            if (Bestellingen != value)
+            if (user_orders != value)
             {
-                Bestellingen = value;
-                OnPropertyChanged(nameof(Bestellingen));
+                user_orders = value;
+                OnPropertyChanged(nameof(Orders));
             }
         }
     }
@@ -84,7 +84,7 @@ public class AccountViewModel : INotifyPropertyChanged
 
     public AccountViewModel(Account account)
     {
-        Naam = account.Username;
+        Name = account.Username;
         Details = account.Details;
         Email = account.Email;
         ProfilePicture = account.ProfilePicture;

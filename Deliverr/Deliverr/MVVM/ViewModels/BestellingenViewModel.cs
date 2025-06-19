@@ -56,7 +56,7 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
         }                                                                               //                                                                                          //
         catch (Exception ex)                                                            //                                                                                          //
         {                                                                               //                                                                                          //
-            Console.WriteLine("Fout bij het laden van bestellingen: " + ex.Message);    // Toon foutmelding in de console                                                           //
+            Console.WriteLine("Error loading orders... " + ex.Message);                 // Toon foutmelding in de console                                                           //
         }                                                                               //                                                                                          //
         finally                                                                         //                                                                                          //
         {                                                                               //                                                                                          //
@@ -77,7 +77,7 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
             }                                                                           //                                                                                          //
             else                                                                        //                                                                                          //
             {                                                                           //                                                                                          //
-                Console.WriteLine($"Start levering mislukt: {result.ReasonPhrase}");    // Toon foutmelding in console                                                              //
+                Console.WriteLine($"Error starting delivery... {result.ReasonPhrase}");    // Toon foutmelding in console                                                              //
             }                                                                           //                                                                                          //
         }                                                                               //                                                                                          //
         catch (Exception ex)                                                            //                                                                                          //
@@ -99,12 +99,12 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
             }                                                                           //                                                                                          //
             else                                                                        //                                                                                          //
             {                                                                           //                                                                                          //
-                Console.WriteLine($"Voltooien levering mislukt: {result.ReasonPhrase}");// Toon foutmelding in console                                                              //
+                Console.WriteLine($"Error finishing delivery... {result.ReasonPhrase}");// Toon foutmelding in console                                                              //
             }                                                                           //                                                                                          //
         }                                                                               //                                                                                          //
         catch (Exception ex)                                                            //                                                                                          //
         {                                                                               //                                                                                          //
-            Console.WriteLine("Voltooien levering mislukt: " + ex.Message);             // Toon foutmelding bij exceptie                                                            //
+            Console.WriteLine("Error finishing delivery... " + ex.Message);             // Toon foutmelding bij exceptie                                                            //
         }                                                                               //                                                                                          //
     }                                                                                   //                                                                                          //
 
