@@ -26,4 +26,4 @@ Developed for the couriers of Matrix Inc.
 
 - Sander Kleijnen
 - Stan Moreaux
-- Rick Theunisz
+(Rick Theunisz)
