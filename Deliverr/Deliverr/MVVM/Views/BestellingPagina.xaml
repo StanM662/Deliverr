@@ -46,7 +46,8 @@
                                     <HorizontalStackLayout Spacing="5">
                                         <Button Text="Start" 
                                                 Command="{Binding BindingContext.StartDeliveryCommand, Source={x:Reference BestellingPage}}"
-                                                CommandParameter="{Binding .}" />
+                                                CommandParameter="{Binding .}" 
+                                                BackgroundColor="LightGreen" />
 
                                         <Button Text="Complete" 
                                                 Command="{Binding BindingContext.CompleteDeliveryCommand, Source={x:Reference BestellingPage}}"
