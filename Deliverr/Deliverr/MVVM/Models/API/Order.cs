@@ -12,4 +12,6 @@ public partial class Order
     public Customer Customer { get; set; }
     public List<Product> Products { get; set; }
     public List<DeliveryState> DeliveryStates { get; set; }
+    public string DeliveryStatus { get; set; }
+
 }
