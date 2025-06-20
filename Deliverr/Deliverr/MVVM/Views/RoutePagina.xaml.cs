@@ -1,5 +1,3 @@
-using System.Formats.Tar;
-
 namespace Deliverr;
 
 public partial class RoutePagina : ContentPage
@@ -22,7 +20,7 @@ public partial class RoutePagina : ContentPage
         }
         else
         {
-            DisplayAlert("Fout", "Voer geldige coördinaten in (bijv. 50.53284, 5.44237)", "OK");
+            DisplayAlert("Fout", "Enter valid coördinates (bijv. 50.53284, 5.44237)", "OK");
         }
     }
 
