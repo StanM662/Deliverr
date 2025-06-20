@@ -184,4 +184,4 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
     public event PropertyChangedEventHandler? PropertyChanged;                          // Event voor property changes (voor databinding)                                           //
     protected void OnPropertyChanged(string propertyName) =>                            // Methode om het PropertyChanged event te triggeren                                        //
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));      // Notificeer listeners dat een property is veranderd                                       //
-}                                                                                       //                                                                                          //
+}                                                                                       // Hoi Stan                                                                             //
