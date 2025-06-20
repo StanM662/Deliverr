@@ -3,4 +3,8 @@
 	<application android:allowBackup="true" android:icon="@mipmap/deliverrappicon" android:supportsRtl="true" android:usesCleartextTraffic="true" android:enableOnBackInvokedCallback="true"></application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+	<uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.MANAGE_MEDIA" />
 </manifest>

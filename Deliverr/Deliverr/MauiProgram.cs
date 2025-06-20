@@ -5,7 +5,6 @@ using Deliverr.ViewModels;
 namespace Deliverr;
 
 
-
 public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
@@ -15,7 +14,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiMaps()
-
+            
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
