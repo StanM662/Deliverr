@@ -17,30 +17,11 @@ namespace Deliverr
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
+            Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = false, IsVisible = false });
 
-            await vm.LoadOrdersAsync();
+            await vm.LoadInitialOrders();
         }
 
-        private async void OnRouteButtonClicked(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new RoutePage());
-        }
-    }
-
-    public class RoutePage : ContentPage
-    {
-        private readonly Route route;
-
-        public RoutePage()
-        {
-            route = new Route();
-            Content = new Label { Text = "Route Page" };
-        }
-
-        protected override async void OnAppearing()
-        {
-            base.OnAppearing();
-            await route.FetchAndDisplayRouteAsync();
-        }
     }
 }

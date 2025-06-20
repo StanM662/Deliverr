@@ -8,4 +8,11 @@ public partial class LoginPagina : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
+        Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = false, IsVisible = false });
+    }
 }

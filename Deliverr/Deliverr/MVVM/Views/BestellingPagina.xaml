@@ -20,6 +20,7 @@
                                    Color="DarkGray" />
 
                 <CollectionView ItemsSource="{Binding Orders}">
+
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Frame BorderColor="LightGray" CornerRadius="5" Padding="10" Margin="10">
@@ -64,6 +65,11 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+                <Button Text="Load more Orders"
+                        Command="{Binding LoadMoreOrdersCommand}"
+                        BackgroundColor="#1338BE" />
+
+
             </VerticalStackLayout>
         </ScrollView>
     </ContentPage.Content>

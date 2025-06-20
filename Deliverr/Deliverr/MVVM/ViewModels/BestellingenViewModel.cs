@@ -1,50 +1,87 @@
 ﻿using System.Collections.ObjectModel;                                                   // Voor het gebruiken van een dynamische lijst die meldingen stuurt bij veranderingen       //
 using System.ComponentModel;                                                            // Voor het implementeren van INotifyPropertyChanged (databinding support)                  //
+using System.Runtime.CompilerServices;
 using System.Windows.Input;                                                             // Voor ICommand (voor binding van knoppen aan methodes)                                    //
 using Deliverr.Models;                                                                  // Voor toegang tot de Order klasse en andere modellen                                      //
 namespace Deliverr.ViewModels;                                                          // Namespace voor ViewModels binnen het Deliverr project                                    //
 public class BestellingenViewModel : INotifyPropertyChanged                             // ViewModel voor het beheren van bestellingen in de UI                                     //
 {                                                                                       //                                                                                          //
-    private readonly ApiService _apiService = new ApiService();                         // Instantie van de ApiService om data op te halen en te verzenden                          //
-    private ObservableCollection<Order> _orders = new();                                // Verzameling van bestellingen die in de UI weergegeven wordt                              //
-    private bool _isLoading;                                                            // Geeft aan of er op dit moment data geladen wordt                                         //
+    private readonly ApiService _apiService = new ApiService();
+    private ObservableCollection<Order> _orders = new();
+    private bool _isLoading;
+    private int _currentId = 1;
 
-    public ObservableCollection<Order> Orders                                           // Publieke eigenschap voor binding van de bestellingen in de UI                            //
-    {                                                                                   //                                                                                          //
-        get => _orders;                                                                 // Geeft de huidige lijst terug                                                             //
-        set                                                                             //                                                                                          //
-        {                                                                               //                                                                                          //
-            if (_orders != value)                                                       // Alleen wijzigen als de nieuwe waarde anders is                                           //
-            {                                                                           //                                                                                          //
-                _orders = value;                                                        // Wijzig de interne waarde                                                                 //
-                OnPropertyChanged(nameof(Orders));                                      // Informeer de UI dat de waarde is aangepast                                               //
-            }                                                                           //                                                                                          //
-        }                                                                               //                                                                                          //
-    }                                                                                   //                                                                                          //
+    public ObservableCollection<Order> Orders
+    {
+        get => _orders;
+        set
+        {
+            if (_orders != value)
+            {
+                _orders = value;
+                OnPropertyChanged(nameof(Orders));
+            }
+        }
+    }
 
-    public bool IsLoading                                                               // Publieke eigenschap om te tonen of data geladen wordt                                    //
-    {                                                                                   //                                                                                          //
-        get => _isLoading;                                                              // Geeft de huidige status terug                                                            //
-        set                                                                             //                                                                                          //
-        {                                                                               //                                                                                          //
-            if (_isLoading != value)                                                    // Alleen wijzigen als de waarde anders is                                                  //
-            {                                                                           //                                                                                          //
-                _isLoading = value;                                                     // Wijzig de interne waarde                                                                 //
-                OnPropertyChanged(nameof(IsLoading));                                   // Informeer de UI dat de waarde is aangepast                                               //
-            }                                                                           //                                                                                          //
-        }                                                                               //                                                                                          //
-    }                                                                                   //                                                                                          //
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set
+        {
+            if (_isLoading != value)
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
+        }
+    }
 
-    public ICommand StartDeliveryCommand { get; }                                       // Command voor het starten van een levering                                                //
-    public ICommand CompleteDeliveryCommand { get; }                                    // Command voor het voltooien van een levering                                              //
-    public BestellingenViewModel()                                                      // Constructor van de ViewModel                                                             //
-    {                                                                                   //                                                                                          //
-        StartDeliveryCommand = new Command<Order>(async order =>                        // Initialiseer StartDeliveryCommand met async lambda                                       //
-            await StartDelivery(order));                                                //                                                                                          //
-        CompleteDeliveryCommand = new Command<Order>(async order =>                     // Initialiseer CompleteDeliveryCommand met async lambda                                    //
-            await CompleteDelivery(order));                                             //                                                                                          //
-    }                                                                                   //                                                                                          //                                                                                  //                                                                                          //
+    public ICommand LoadMoreOrdersCommand { get; }
+    public ICommand StartDeliveryCommand { get; }
+    public ICommand CompleteDeliveryCommand { get; }
 
+    public BestellingenViewModel()
+    {
+        StartDeliveryCommand = new Command<Order>(async order => await StartDelivery(order));
+        CompleteDeliveryCommand = new Command<Order>(async order => await CompleteDelivery(order));
+        LoadMoreOrdersCommand = new Command(async () => await LoadNextOrders());
+    }
+
+    public async Task LoadInitialOrders()
+    {
+        await LoadNextOrders(); 
+    }
+
+    private async Task LoadNextOrders()
+    {
+        if (IsLoading) return;
+
+        IsLoading = true;
+
+        for (int i = 0; i < 20; i++)
+        {
+            try
+            {
+                var order = await _apiService.GetOrderByIdAsync(_currentId);
+                if (order != null)
+                {
+                    // Set default state or delivery status
+                    order.DeliveryStates = new List<DeliveryState> { new DeliveryState { State = 1 } };
+                    order.DeliveryStatus = "Pending";
+                    Orders.Add(order);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Order with ID {_currentId} not found or error: {ex.Message}");
+            }
+
+            _currentId++;
+        }
+
+        IsLoading = false;
+    }
     public async Task LoadOrdersAsync()
     {
         if (Orders.Count >= 1)

@@ -12,8 +12,8 @@ public partial class WelkomPagina : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = true, IsVisible = false });
-        Shell.Current.FlyoutBehavior = FlyoutBehavior.Flyout;
+        Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
+        Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = false, IsVisible = false });
     }
 
 }

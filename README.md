@@ -25,5 +25,5 @@ Developed for the couriers of Matrix Inc.
 ## Contributors
 
 - Sander Kleijnen
-- Stan Moreaux
+- Stan Morreau
 - (Rick Theunisz)

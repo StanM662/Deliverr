@@ -25,6 +25,8 @@ namespace Deliverr
 
             var viewModel = new AccountViewModel(account);
             BindingContext = viewModel;
+            Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
+            Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = false, IsVisible = false });
 
         }
     }
