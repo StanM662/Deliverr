@@ -8,9 +8,8 @@ Developed for the couriers of Matrix Inc.
 ## Features (Planned)
 
 - Camera functionality
-- GPS tracking
+- Route planning
 - Update delivery status
-- Push notifications
 
 ---
 
