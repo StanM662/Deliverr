@@ -48,7 +48,7 @@ public partial class LoginViewModel : ObservableObject
             UserSession.LoggedInUser = account.Username;
             UserSession.LoggedInAccount = account;
 
-            await Shell.Current.GoToAsync("//WelkomPagina");
+            await Shell.Current.GoToAsync("WelkomPagina");
         }
         else
         {

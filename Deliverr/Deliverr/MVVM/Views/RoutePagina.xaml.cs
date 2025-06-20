@@ -1,14 +1,11 @@
-using Deliverr.ViewModels;
 namespace Deliverr;
 
-public partial class LoginPagina : ContentPage
+public partial class RoutePagina : ContentPage
 {
-    public LoginPagina(LoginViewModel viewModel)
-    {
-        InitializeComponent();
-        BindingContext = viewModel;
-    }
-
+	public RoutePagina()
+	{
+		InitializeComponent();
+	}
     protected override void OnAppearing()
     {
         base.OnAppearing();

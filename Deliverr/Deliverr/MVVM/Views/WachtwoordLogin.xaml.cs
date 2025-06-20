@@ -13,6 +13,7 @@ public partial class WachtwoordLogin : ContentPage
     {
         base.OnAppearing();
         Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
+        Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = false, IsVisible = false });
     }
 
 }

@@ -4,7 +4,7 @@
        xmlns:pages="clr-namespace:Deliverr"
        x:Class="Deliverr.AppShell">
 
-    <FlyoutItem Title="Home" Route="WelkomPagina">
+    <!-- <FlyoutItem Title="Home" Route="WelkomPagina">
         <ShellContent ContentTemplate="{DataTemplate pages:WelkomPagina}" />
     </FlyoutItem>
 
@@ -14,6 +14,28 @@
 
     <FlyoutItem Title="Account" Route="AccountPagina">
         <ShellContent ContentTemplate="{DataTemplate pages:AccountPagina}" />
-    </FlyoutItem>
+    </FlyoutItem> -->
+
+    <TabBar>
+        <Tab Title="Home"
+            Icon="home.png">
+            <ShellContent ContentTemplate="{DataTemplate pages:WelkomPagina}" />
+        </Tab>
+        
+        <Tab Title="Orders"
+            Icon="orders.png">
+            <ShellContent ContentTemplate="{DataTemplate pages:BestellingPagina}" />
+        </Tab>
+        
+        <Tab Title="Route"
+            Icon="route.png">
+            <ShellContent ContentTemplate="{DataTemplate pages:RoutePagina}" />
+        </Tab>
+        
+        <Tab Title="Account"
+            Icon="account.png">
+            <ShellContent ContentTemplate="{DataTemplate pages:AccountPagina}" />
+        </Tab>
+    </TabBar>
 
 </Shell>

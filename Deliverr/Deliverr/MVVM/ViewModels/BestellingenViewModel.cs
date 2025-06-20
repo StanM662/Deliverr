@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;                                                   // Voor het gebruiken van een dynamische lijst die meldingen stuurt bij veranderingen       //
 using System.ComponentModel;                                                            // Voor het implementeren van INotifyPropertyChanged (databinding support)                  //
+using System.Runtime.CompilerServices;
 using System.Windows.Input;                                                             // Voor ICommand (voor binding van knoppen aan methodes)                                    //
 using Deliverr.Models;                                                                  // Voor toegang tot de Order klasse en andere modellen                                      //
 namespace Deliverr.ViewModels;                                                          // Namespace voor ViewModels binnen het Deliverr project                                    //
@@ -142,6 +143,19 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
             updatedOrder.DeliveryStatus = _state;
             Orders[index] = updatedOrder;
         }
+    }
+
+    public async Task LoadOrders(int id)
+    {
+        for (int i = 0; i < Orders.Count; i++)
+        
+            if ()
+            {
+                
+                break;
+            }
+        }
+        await _apiService.GetOrderByIdAsync(id);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;                          // Event voor property changes (voor databinding)                                           //
