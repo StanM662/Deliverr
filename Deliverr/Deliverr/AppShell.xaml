@@ -15,5 +15,7 @@
     <FlyoutItem Title="Account" Route="AccountPagina">
         <ShellContent ContentTemplate="{DataTemplate pages:AccountPagina}" />
     </FlyoutItem>
-
+    <FlyoutItem Title="Route" Route="RoutePagina">
+        <ShellContent ContentTemplate="{DataTemplate pages:RoutePagina}" />
+    </FlyoutItem>
 </Shell>

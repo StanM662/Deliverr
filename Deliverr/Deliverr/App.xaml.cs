@@ -15,4 +15,5 @@ public partial class App : Application
             await Shell.Current.GoToAsync(nameof(NaamLogin));
         });
     }
+
 }

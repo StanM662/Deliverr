@@ -24,6 +24,9 @@
                         <DataTemplate>
                             <Frame BorderColor="LightGray" CornerRadius="5" Padding="10" Margin="10">
                                 <VerticalStackLayout>
+                                    <Button 
+                                        Text="Bekijk Route"
+                                        Clicked="OnRouteButtonClicked"/>
 
                                     <HorizontalStackLayout Spacing="5">
                                         <Label Text="Order" FontAttributes="Bold" FontSize="20"/>
