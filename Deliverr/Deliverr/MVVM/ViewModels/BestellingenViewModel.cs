@@ -147,7 +147,7 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
         }
     }
 
-    private async Task CompleteDelivery(Order order)
+    public async Task CompleteDelivery(Order order)
     {
         if (order == null) return;
 

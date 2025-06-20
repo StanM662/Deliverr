@@ -1,4 +1,6 @@
-﻿namespace Deliverr;
+﻿using Deliverr.Views;
+
+namespace Deliverr;
 
 public partial class AppShell : Shell
 {
@@ -18,6 +20,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(BestellingPagina), typeof(BestellingPagina));
         Routing.RegisterRoute(nameof(AccountPagina), typeof(AccountPagina));
         Routing.RegisterRoute(nameof(RoutePagina), typeof(RoutePagina));
-
+        Routing.RegisterRoute(nameof(CompletePagina), typeof(CompletePagina));
+    
     }
 }

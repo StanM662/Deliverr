@@ -50,9 +50,8 @@
                                                 CommandParameter="{Binding .}" 
                                                 BackgroundColor="#69c96f" />
 
-                                        <Button Text="Complete" 
-                                                Command="{Binding BindingContext.CompleteDeliveryCommand, Source={x:Reference BestellingPage}}"
-                                                CommandParameter="{Binding .}"
+                                        <Button Text="Complete"  
+                                                Clicked="OnCompleteClicked"
                                                 BackgroundColor="#1338BE" />
 
                                     </HorizontalStackLayout>

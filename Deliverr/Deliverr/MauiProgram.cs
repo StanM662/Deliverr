@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Deliverr.ViewModels;
+using Deliverr.Views;
 
 
 namespace Deliverr;
@@ -26,6 +27,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<WachtwoordLogin>();
         builder.Services.AddSingleton<PageViewModel>();
         builder.Services.AddSingleton<LoginViewModel>();
+        builder.Services.AddSingleton<CompletePagina>();
 
 #if DEBUG
         builder.Logging.AddDebug();

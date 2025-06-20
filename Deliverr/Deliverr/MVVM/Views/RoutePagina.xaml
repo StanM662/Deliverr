@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deliverr.RoutePagina"
              Title="Route">
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
+
             <Label Text="Route" FontAttributes="Bold" FontSize="24" HorizontalOptions="Center" />
 
             <Label Text="Start (lat, lon)" />
@@ -16,6 +18,8 @@
             <Button Text="Toon Route" Clicked="OnToonRouteClicked" />
 
             <WebView x:Name="KaartView" HeightRequest="400" />
+
         </VerticalStackLayout>
     </ScrollView>
+
 </ContentPage>

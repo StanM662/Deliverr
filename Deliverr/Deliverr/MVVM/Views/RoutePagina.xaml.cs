@@ -1,4 +1,4 @@
-using System.Formats.Tar;
+using Deliverr.Models;
 
 namespace Deliverr;
 
@@ -7,10 +7,9 @@ public partial class RoutePagina : ContentPage
     public RoutePagina()
     {
         InitializeComponent();
-        ToonKaartMetRoute("50.53284, 5.44237", "50.52538, 5.57355");
     }
 
-    private void OnToonRouteClicked(object sender, EventArgs e)
+    private async void OnToonRouteClicked(object sender, EventArgs e)
     {
         string startInput = StartEntry.Text;
         string endInput = EndEntry.Text;
@@ -22,7 +21,7 @@ public partial class RoutePagina : ContentPage
         }
         else
         {
-            DisplayAlert("Fout", "Voer geldige coördinaten in (bijv. 50.53284, 5.44237)", "OK");
+            await DisplayAlert("Fout", "Voer geldige coördinaten in (bijv. 50.53284, 5.44237)", "OK");
         }
     }
 
@@ -47,26 +46,33 @@ public partial class RoutePagina : ContentPage
         string routeCoordinaten = $"[{FormatCoords(start)}, {FormatCoords(end)}]";
 
         string html = $@"
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset='utf-8'/>
-  <title>Route Kaart</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <link rel='stylesheet' href='https://unpkg.com/leaflet@1.7.1/dist/leaflet.css'/>
-</head>
-<body>
-  <div id='map' style='width:100vw; height:100vh;'></div>
-  <script src='https://unpkg.com/leaflet@1.7.1/dist/leaflet.js'></script>
-  <script>
-    var route = {routeCoordinaten};
-    var map = L.map('map').setView(route[0], 13);
-    L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png').addTo(map);
-    var polyline = L.polyline(route, {{ color: 'blue' }}).addTo(map);
-    map.fitBounds(polyline.getBounds());
-  </script>
-</body>
-</html>";
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset='utf-8'/>
+              <title>Route Kaart</title>
+              <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+              <link rel='stylesheet' href='https://unpkg.com/leaflet@1.7.1/dist/leaflet.css'/>
+              <style>body, html, #map {{margin:0;padding:0;height:100%;}}</style>
+            </head>
+            <body>
+              <div id='map'></div>
+              <script src='https://unpkg.com/leaflet@1.7.1/dist/leaflet.js'></script>
+              <script>
+                var route = {routeCoordinaten};
+                var map = L.map('map').setView(route[0], 13);
+                L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png').addTo(map);
+
+                var latlngs = route.map(function(c) {{ return [c[0], c[1]]; }});
+                var polyline = L.polyline(latlngs, {{ color: 'blue' }}).addTo(map);
+
+                L.marker(latlngs[0]).addTo(map).bindPopup('Start').openPopup();
+                L.marker(latlngs[1]).addTo(map).bindPopup('End');
+
+                map.fitBounds(polyline.getBounds());
+              </script>
+            </body>
+            </html>";
 
         KaartView.Source = new HtmlWebViewSource { Html = html };
     }
