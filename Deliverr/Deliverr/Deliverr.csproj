@@ -69,6 +69,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="MVVM\Views\lege_pagina_voor_stan.xaml.cs">
+	    <DependentUpon>lege_pagina_voor_stan.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="MVVM\Views\RoutePagina.xaml.cs">
 	    <DependentUpon>RoutePagina.xaml</DependentUpon>
 	  </Compile>
@@ -91,6 +94,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="MVVM\Views\NaamLogin.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="MVVM\Views\lege_pagina_voor_stan.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="MVVM\Views\RoutePagina.xaml">
