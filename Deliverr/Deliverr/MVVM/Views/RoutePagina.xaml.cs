@@ -10,8 +10,10 @@ public partial class RoutePagina : ContentPage
 
     private void ToonKaartMetRoute()
     {
-        // Voorbeeld route: Heidelberg centrum naar Heidelberg station (vervang met je eigen polyline!)
-        string routeCoordinaten = "[[50.53284, 5.44237], [50.52538, 5.57355]]"; // [lat, lon] pairs
+        string latitude = "50.53284, 5.44237";
+        string longitude = "50.52538, 5.57355";
+
+        string routeCoordinaten = $"[[{latitude}], [{longitude}]]"; 
         string html = $@"
 <!DOCTYPE html>
 <html>
