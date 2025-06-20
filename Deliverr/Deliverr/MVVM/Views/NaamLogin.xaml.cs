@@ -18,6 +18,8 @@ public partial class NaamLogin : ContentPage
         base.OnAppearing();
         Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
         Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = false, IsVisible = false });
+        Shell.SetTabBarIsVisible(this, false);
+
     }
 
 }

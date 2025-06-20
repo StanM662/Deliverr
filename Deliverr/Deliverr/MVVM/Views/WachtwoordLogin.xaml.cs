@@ -13,7 +13,9 @@ public partial class WachtwoordLogin : ContentPage
     {
         base.OnAppearing();
         Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
-        Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = false, IsVisible = false });
+        Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = true, IsVisible = true });
+        Shell.SetTabBarIsVisible(this, false);
+
     }
 
 }

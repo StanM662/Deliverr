@@ -4,18 +4,6 @@
        xmlns:pages="clr-namespace:Deliverr"
        x:Class="Deliverr.AppShell">
 
-    <!-- <FlyoutItem Title="Home" Route="WelkomPagina">
-        <ShellContent ContentTemplate="{DataTemplate pages:WelkomPagina}" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="Bestellingen" Route="BestellingPagina">
-        <ShellContent ContentTemplate="{DataTemplate pages:BestellingPagina}" />
-    </FlyoutItem>
-
-    <FlyoutItem Title="Account" Route="AccountPagina">
-        <ShellContent ContentTemplate="{DataTemplate pages:AccountPagina}" />
-    </FlyoutItem> -->
-
     <TabBar>
         <Tab Title="Home"
             Icon="home.png">

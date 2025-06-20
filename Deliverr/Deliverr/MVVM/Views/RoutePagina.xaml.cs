@@ -11,8 +11,7 @@ public partial class RoutePagina : ContentPage
     private void ToonKaartMetRoute()
     {
         // Voorbeeld route: Heidelberg centrum naar Heidelberg station (vervang met je eigen polyline!)
-        string routeCoordinaten = "[[8.681495,49.41461],[8.687872,49.420318]]"; // [lon, lat]!
-
+        string routeCoordinaten = "[[50.53284, 5.44237], [50.52538, 5.57355]]"; // [lat, lon] pairs
         string html = $@"
 <!DOCTYPE html>
 <html>
@@ -29,10 +28,12 @@ public partial class RoutePagina : ContentPage
     var map = L.map('map').setView([49.417, 8.684], 14);
     L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png').addTo(map);
 
-    var route = {routeCoordinaten};
+    var route = [[50.53284, 5.44237], [50.52538, 5.57355]];
     var latlngs = route.map(function(c) {{ return [c[1], c[0]]; }});
-    var polyline = L.polyline(latlngs, {{color:'blue'}}).addTo(map);
+    var route = [[50.53284, 5.44237], [50.52538, 5.57355]];
+    var polyline = L.polyline(route, {{color: 'blue' }}).addTo(map);
     map.fitBounds(polyline.getBounds());
+
   </script>
 </body>
 </html>";

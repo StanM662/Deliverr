@@ -1,24 +1,31 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Deliverr.WachtwoordLogin">
-    
-    <VerticalStackLayout>
-        <Label Padding="50" Text="Password" FontSize="Large" HorizontalOptions="Center"></Label>
+
+    <VerticalStackLayout Padding="30,0" Spacing="25">
+
+        <HorizontalStackLayout Spacing="5">
+            <Label Text="Welcome to " FontAttributes="Bold" FontSize="30"/>
+            <Label Text="Deliverr" TextColor="#FFE87C" FontAttributes="Bold" FontSize="30"/>
+        </HorizontalStackLayout>
+
+        <Label Padding="50" Text="Password" FontSize="Large" HorizontalOptions="Center" />
         <Entry Placeholder="Start typing..."
-           Text="{Binding Password}"
-           WidthRequest="250"
-           HorizontalOptions="Center"
-           IsPassword="True"
-           VerticalOptions="Center" />
+               Text="{Binding Password}"
+               WidthRequest="250"
+               HorizontalOptions="Center"
+               IsPassword="True"
+               VerticalOptions="Center" />
+
         <Frame BackgroundColor="LightSkyBlue" Padding="20" WidthRequest="200" HorizontalOptions="Center" HasShadow="True">
             <Grid>
                 <Label Text="Continue" HorizontalOptions="Center" VerticalOptions="Center" TextColor="White" />
             </Grid>
             <Frame.GestureRecognizers>
-                <TapGestureRecognizer
-         Command="{Binding VerifyPasswordCommand}"/>
+                <TapGestureRecognizer Command="{Binding VerifyPasswordCommand}" />
             </Frame.GestureRecognizers>
         </Frame>
+
     </VerticalStackLayout>
+
 </ContentPage>
