@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Deliverr.Models;
+﻿namespace Deliverr.Models;
 
 public partial class Order
 {

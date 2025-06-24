@@ -1,6 +1,4 @@
-﻿using Deliverr.Models;
-namespace Deliverr.Models;
-
+﻿namespace Deliverr.Models;
 public enum DeliveryStatesEnum
 {
     Pending = 1,

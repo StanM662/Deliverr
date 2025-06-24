@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Deliverr.Models;
+﻿namespace Deliverr.Models;
 
 public class DeliveryState
 {

@@ -7,7 +7,6 @@ namespace Deliverr
     public partial class BestellingPagina : ContentPage
     {
         private BestellingenViewModel vm;
-        private ApiService _apiService = new ApiService();
         private bool ordersLoaded = false;
         public BestellingPagina()
         {
@@ -22,17 +21,6 @@ namespace Deliverr
             base.OnAppearing();
             Shell.SetFlyoutBehavior(this, FlyoutBehavior.Disabled);
             Shell.SetBackButtonBehavior(this, new BackButtonBehavior { IsEnabled = false, IsVisible = false });
-
-            MessagingCenter.Subscribe<CompletePagina, Order>(this, "OrderCompleted", (sender, updatedOrder) =>
-            {
-                var oldOrder = vm.Orders.FirstOrDefault(o => o.Id == updatedOrder.Id);
-                if (oldOrder != null)
-                {
-                    vm.Orders.Remove(oldOrder);
-                    vm.Orders.Add(updatedOrder);
-                }
-            });
-
             if (ordersLoaded == false)
             {
                 await vm.LoadInitialOrders(20);
@@ -48,7 +36,6 @@ namespace Deliverr
             {
                 try
                 {
-                    // 1. Foto maken
                     var foto = await MediaPicker.CapturePhotoAsync();
                     if (foto == null)
                     {
@@ -57,16 +44,9 @@ namespace Deliverr
                     }
 
                     var stream = await foto.OpenReadAsync();
-
-                    // 2. Navigeer naar CompletePagina met order en fotoStream (zonder update)
                     var completePagina = new CompletePagina();
                     completePagina.InitializeWithData(order, stream);
-
-                    // Navigeer en wacht op resultaat (bool) via TaskCompletionSource of MessagingCenter (hier eenvoudig via await PushAsync)
                     await Navigation.PushAsync(completePagina);
-
-                    // Eventueel: refresh orders als update succesvol was in CompletePagina (zie daar)
-
                 }
                 catch (Exception ex)
                 {

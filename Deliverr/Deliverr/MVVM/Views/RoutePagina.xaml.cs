@@ -11,17 +11,24 @@ public partial class RoutePagina : ContentPage
 
     private async void OnToonRouteClicked(object sender, EventArgs e)
     {
-        string startInput = StartEntry.Text;
-        string endInput = EndEntry.Text;
+        try
+        {
+            string startInput = StartEntry.Text;
+            string endInput = EndEntry.Text;
 
-        if (TryParseCoordinates(startInput, out double[] startCoords) &&
-            TryParseCoordinates(endInput, out double[] endCoords))
-        {
-            ToonKaartMetRoute(startInput, endInput);
+            if (TryParseCoordinates(startInput, out double[] startCoords) &&
+                TryParseCoordinates(endInput, out double[] endCoords))
+            {
+                ToonKaartMetRoute(startInput, endInput);
+            }
+            else
+            {
+                await DisplayAlert("Fout", "Voer geldige coördinaten in (bijv. 50.53284, 5.44237)", "OK");
+            }
         }
-        else
+        catch (Exception _e)
         {
-            await DisplayAlert("Fout", "Voer geldige coördinaten in (bijv. 50.53284, 5.44237)", "OK");
+            await DisplayAlert("Fout", "Er is een fout opgetreden: " + _e.Message, "OK");
         }
     }
 

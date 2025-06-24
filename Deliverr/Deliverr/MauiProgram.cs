@@ -25,7 +25,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<BestellingPagina>();
         builder.Services.AddSingleton<NaamLogin>();
         builder.Services.AddSingleton<WachtwoordLogin>();
-        builder.Services.AddSingleton<PageViewModel>();
         builder.Services.AddSingleton<LoginViewModel>();
         builder.Services.AddSingleton<CompletePagina>();
 

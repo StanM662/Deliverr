@@ -7,7 +7,7 @@
     <VerticalStackLayout>
         <VerticalStackLayout HorizontalOptions="Center" Padding="25">
             <Image Source="{Binding ProfilePicture.Source}" HeightRequest="150" Aspect="AspectFit" />
-            <Label Text="{Binding Naam, StringFormat='Welkom {0}!'}" FontSize="36" />
+            <Label Text="{Binding Name, StringFormat='Welkom {0}!'}" FontSize="36" />
             <Label Text="{Binding Details}" FontSize="24"/>
             <Label Text="{Binding Email}" FontSize="18"/>
 

@@ -1,207 +1,194 @@
-﻿using System.Collections.ObjectModel;                                                   // Voor het gebruiken van een dynamische lijst die meldingen stuurt bij veranderingen       //
-using System.ComponentModel;                                                            // Voor het implementeren van INotifyPropertyChanged (databinding support)                  //
-using System.Runtime.CompilerServices;
-using System.Windows.Input;                                                             // Voor ICommand (voor binding van knoppen aan methodes)                                    //
-using Deliverr.Models;                                                                  // Voor toegang tot de Order klasse en andere modellen                                      //
-namespace Deliverr.ViewModels;                                                          // Namespace voor ViewModels binnen het Deliverr project                                    //
-public class BestellingenViewModel : INotifyPropertyChanged                             // ViewModel voor het beheren van bestellingen in de UI                                     //
-{                                                                                       //                                                                                          //
-    private readonly ApiService _apiService = new ApiService();
-    private ObservableCollection<Order> _orders = new();
-    private bool _isLoading;
-    private int _currentId = 1;
+﻿using System.Collections.ObjectModel;                                                                       //  Voor het gebruiken van een dynamische lijst die meldingen stuurt bij veranderingen                      //
+using System.ComponentModel;                                                                                //  Voor het implementeren van INotifyPropertyChanged (databinding support)                                 //
+using System.Windows.Input;                                                                                 //  Voor ICommand (voor binding van knoppen aan methodes)                                                   //
+using Deliverr.Models;                                                                                      //  Voor toegang tot de Order klasse en andere modellen                                                     //
+namespace Deliverr.ViewModels;                                                                              //  Namespace voor ViewModels binnen het Deliverr project                                                   //
+public class BestellingenViewModel : INotifyPropertyChanged                                                 //  ViewModel voor het beheren van orders in de UI                                                          //
+{                                                                                                           //                                                                                                          //
+    private readonly ApiService _apiService = new ApiService();                                             //  Private readonly ApiService instantie voor het maken van API-aanroepen naar de ApiService class         //
+    private ObservableCollection<Order> _orders = new ObservableCollection<Order>();                        //  _orders ObservableCollection (soort van lijst) voor orders wat de UI doet veranderen bij updates        //
+    private bool _isLoading;                                                                                //  _isLoading bool voor het bijhouden of er orders worden aangeroepen (UI-feedback)                        //
+    private int _currentId = 1;                                                                             //  _currentId int voor het bijhouden van de huidige ID van de order die wordt opgehaald (start bij 1)      //
+    public ObservableCollection<Order> Orders                                                               //  OC voor Orders die de lijst van orders bevat en meldingen stuurt bij veranderingen                      //
+    {                                                                                                       //                                                                                                          //
+        get => _orders;                                                                                     //  Getter voor de Orders collectie                                                                         //
+        private set                                                                                         //  Setter voor de Orders collectie (private om alleen binnen dit ViewModel te kunnen wijzigen)             //
+        {                                                                                                   //                                                                                                          //
+            if (_orders != value)                                                                           //  Controleer of de nieuwe waarde verschilt van de oude waarde                                             //
+            {                                                                                               //                                                                                                          //
+                _orders = value;                                                                            //  Zet de nieuwe waarde als de oude waarde verschilt                                                       //
+                OnPropertyChanged(nameof(Orders));                                                          //  Trigger het PropertyChanged event voor databinding                                                      //
+            }                                                                                               //  De OnPropertyChanged functie wordt gebruikt om de UI te informeren dat de waarde is veranderd.          //
+        }                                                                                                   //                                                                                                          //
+    }                                                                                                       //                                                                                                          //
 
-    public ObservableCollection<Order> Orders
-    {
-        get => _orders;
-        set
-        {
-            if (_orders != value)
-            {
-                _orders = value;
-                OnPropertyChanged(nameof(Orders));
-            }
-        }
-    }
-
-    public bool IsLoading
-    {
-        get => _isLoading;
-        set
-        {
-            if (_isLoading != value)
-            {
-                _isLoading = value;
-                OnPropertyChanged(nameof(IsLoading));
-            }
-        }
-    }
-
-    public ICommand LoadMoreOrdersCommand { get; }
-    public ICommand StartDeliveryCommand { get; }
-    public ICommand CompleteDeliveryCommand { get; }
-
-    public BestellingenViewModel()
-    {
-        StartDeliveryCommand = new Command<Order>(async order => await StartDelivery(order));
-        CompleteDeliveryCommand = new Command<Order>(async order => await CompleteDelivery(order));
-        LoadMoreOrdersCommand = new Command(async () => await LoadNextOrders(20));
-    }
-
-    public async Task LoadInitialOrders(int orderCap)
-    {
-        await LoadNextOrders(orderCap); 
-    }
-
-    private async Task LoadNextOrders(int batchSize)
-    {
-        if (IsLoading) return;
-
-        IsLoading = true;
-        int addedCount = 0;
-
-        while (addedCount < batchSize)
-        {
-            try
-            {
-                var order = await _apiService.GetOrderByIdAsync(_currentId);
-                _currentId++;  // increment regardless of success or failure to avoid infinite loop
-
-                if (order == null)
-                {
-                    // No order found for this ID, skip
-                    continue;
-                }
-
-                var statesForOrder = order.DeliveryStates ?? new List<DeliveryState>();
-
-                if (!statesForOrder.Any())
-                {
-                    // No states found - consider it Pending
-                    order.DeliveryStates = new List<DeliveryState> { new DeliveryState { State = 1 } };
-                    order.DeliveryStatus = "Pending";
-                    Orders.Add(order);
-                    addedCount++;
-                    Console.WriteLine($"Added Pending order {order.Id} (no delivery states)");
-                }
-                else if (statesForOrder.Count == 1 && statesForOrder[0].State == 1)
-                {
-                    // Exactly one delivery state and it is Pending
-                    order.DeliveryStatus = "Pending";
-                    Orders.Add(order);
-                    addedCount++;
-                    Console.WriteLine($"Added Pending order {order.Id}");
-                }
-                else
-                {
-                    // Skip orders with multiple states or non-pending states
-                    Console.WriteLine($"Skipped order {order.Id} with delivery states count: {statesForOrder.Count} or non-pending state.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading order with ID {_currentId}: {ex.Message}");
-                _currentId++; // increment anyway to avoid infinite loop on failure
-            }
-        }
-
-        IsLoading = false;
-    }
-    
-    private async Task StartDelivery(Order order)
-    {
-        if (order == null) return;
-
-        try
-        {
-            var result = await _apiService.StartDelivery(order.Id);
-            if (result.IsSuccessStatusCode)
-            {
-                var updatedOrder = await _apiService.GetOrderByIdAsync(order.Id);
-                ReplaceOrderInCollection(updatedOrder, "Shipping");
-                order = updatedOrder;
-            }
-            else
-            {
-                Console.WriteLine($"Start delivery failed: {result.ReasonPhrase}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Fout bij starten levering: {ex.Message}");
-        }
-
-        // ✅ Try to get the address
-        string address = "";
-        try
-        {
-            address = order.Customer.Address;
-
-            if (string.IsNullOrWhiteSpace(address))
-            {
-                throw new Exception("Customer.Address is empty or null.");
-            }
-
-            Console.WriteLine($"Successfully got order address: {address}");
-        }
-        catch (Exception e)
-        {
-            // Fallback address if something goes wrong
-            address = "Nieuw Eyckholt 300, 6419 DJ Heerlen";
-            Console.WriteLine($"Error encountered while getting address: {e.Message}. Using fallback: {address}");
-        }
-
-        // ✅ Launch Google Maps
-        try
-        {
-            string encodedAddress = Uri.EscapeDataString(address);
-            var url = $"https://www.google.com/maps/search/?api=1&query={encodedAddress}";
-            Console.WriteLine($"Opening Google Maps to address: {url}");
-
-            await Launcher.Default.OpenAsync(new Uri(url));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to open Google Maps: {ex.Message}");
-        }
-    }
-
-
-    public async Task CompleteDelivery(Order order)
-    {
-        if (order == null) return;
-
-        try
-        {
-            var result = await _apiService.CompleteDelivery(order.Id);
-            if (result.IsSuccessStatusCode)
-            {
-                var updatedOrder = await _apiService.GetOrderByIdAsync(order.Id);
-                ReplaceOrderInCollection(updatedOrder, "Delivered");
-            }
-            else
-            {
-                Console.WriteLine($"Complete delivery failed: {result.ReasonPhrase}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Fout bij voltooien levering: {ex.Message}");
-        }
-    }
-
-    private void ReplaceOrderInCollection(Order updatedOrder, string _state)
-    {
-        var existing = Orders.FirstOrDefault(o => o.Id == updatedOrder.Id);
-        if (existing != null)
-        {
-            var index = Orders.IndexOf(existing);
-            updatedOrder.DeliveryStatus = _state;
-            Orders[index] = updatedOrder;
-        }
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;                          // Event voor property changes (voor databinding)                                           //
-    protected void OnPropertyChanged(string propertyName) =>                            // Methode om het PropertyChanged event te triggeren                                        //
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));      // Notificeer listeners dat een property is veranderd                                       //
-}                                                                                       // Hoi Stan                                                                             //
+    public bool IsLoading                                                                                   //  IsLoading bool voor het bijhouden of bestellingen worden geladen    (voor UI-feedback)                  //
+    {                                                                                                       //                                                                                                          //
+        get => _isLoading;                                                                                  //  Getter voor de IsLoading property                                                                       //
+        set                                                                                                 //  Setter voor de IsLoading property (private om alleen binnen dit ViewModel te kunnen wijzigen)           //
+        {                                                                                                   //                                                                                                          //
+            if (_isLoading != value)                                                                        //  Als IsLoading niet gelijk is aan de nieuwe waarde, voer dan de volgende acties uit:                     //
+            {                                                                                               //                                                                                                          //
+                _isLoading = value;                                                                         //  IsLoading wordt bijgewerkt met de nieuwe waarde.                                                        //
+                OnPropertyChanged(nameof(IsLoading));                                                       //  Trigger het PropertyChanged event voor databinding                                                      //
+            }                                                                                               //                                                                                                          //
+        }                                                                                                   //                                                                                                          //
+    }                                                                                                       //                                                                                                          //
+                                                                                                            //                                                                                                          //
+    public ICommand LoadMoreOrdersCommand { get; }                                                          //  LoadOrdersCommand voor het laden van meer orders in batches (voor UI-feedback)                          //
+    public ICommand StartDeliveryCommand { get; }                                                           //  StartDeliveryCommand voor het starten van de levering van een order (voor UI-feedback)                  //
+    public ICommand CompleteDeliveryCommand { get; }                                                        //  CompleteDeliveryCommand voor het voltooien van de levering van een order (voor UI-feedback)             //
+                                                                                                            //                                                                                                          //
+    public BestellingenViewModel()                                                                          //  Constructor voor BestellingenViewModel, initialiseert de commando's en laadt de eerste orders           //
+    {                                                                                                       //                                                                                                          //
+    StartDeliveryCommand = new Command<Order>(async order => await StartDelivery(order));                   //  StartDelivery wordt aangeroepen wanneer de gebruiker een order start (voor UI-feedback)                 //
+    CompleteDeliveryCommand = new Command<Order>(async order => await CompleteDelivery(order));             //  CompleteDelivery wordt aangeroepen wanneer de gebruiker een order voltooit (voor UI-feedback)           //
+    LoadMoreOrdersCommand = new Command(async () => await LoadNextOrders(20));                              //  LoadMoreOrders wordt aangeroepen wanneer de gebruiker meer orders laadt (voor UI-feedback)              //
+    }                                                                                                       //                                                                                                          //
+    public async Task LoadInitialOrders(int orderCap)                                                       //  In deze functie worden de eerste 20 orders geladen. Het is een async functie zodat het tegelijk         //
+    {                                                                                                       //  met andere processen kan runnen.                                                                        //
+        await LoadNextOrders(orderCap);                                                                     //  Volgende orders worden aangeroepen met evt. aangepaste orderCap (hoeveel orders geladen wordt)          //
+    }                                                                                                       //                                                                                                          //
+                                                                                                            //                                                                                                          //
+    private async Task LoadNextOrders(int batchSize)                                                        //  LoadNextOrders is een async functie die batches van orders laadt.                                       //
+    {                                                                                                       //  Het is een private functie omdat deze alleen binnen dit ViewModel gebruikt wordt.                       //
+                                                                                                            //  LoadInitialOrders wordt gebruikt voor de eerste orders, LoadMoreOrders voor het laden van meer orders.  //
+        if (IsLoading) return;                                                                              //  Als het orders aan het laden is exit hij uit de functie om dubbele ladingen te voorkomen                //
+                                                                                                            //                                                                                                          //
+        IsLoading = true;                                                                                   //  IsLoading is true om aan te geven dat we bezig zijn met het laden van orders.                           //
+        int addedCount = 0;                                                                                 //  addedCount houdt bij hoeveel orders we hebben toegevoegd in deze batch.                                 //
+                                                                                                            //                                                                                                          //
+        while (addedCount < batchSize)                                                                      //  While-loop om orders te laden totdat we batchSize hebben bereikt of geen orders meer beschikbaar zijn.  //
+        {                                                                                                   //                                                                                                          //
+            try                                                                                             //  Try statement voor extra debugging                                                                      // 
+            {                                                                                               //                                                                                                          //
+                var order = await _apiService.GetOrderByIdAsync(_currentId);                                //  order wordt opgehaald met de huidige ID (_currentID) d.m.v. de ApiService class (_apiService)           //
+                _currentId++;                                                                               //  _currentId wordt verhoogd om de volgende order op te halen in de volgende iteratie van de loop.         //
+                                                                                                            //                                                                                                          //
+                if (order == null) continue;                                                                //  Als de opgehaalde order null is dan returnt hij                                                         //
+                var statesForOrder = order.DeliveryStates ?? new List<DeliveryState>();                     //  De opgehaalde deliverystates voor de order worden in StatesForOrder gezet,                              //
+                                                                                                            //  of in een lege lijst als er geen states zijn (Die ?? operator geeft aan dat dit gebeurt a;s het null is)//
+                if (!statesForOrder.Any())                                                                  //  als statesForOrder geen states bevat, dan runt deze if statement                                        //
+                {                                                                                           //                                                                                                          //
+                    order.DeliveryStates = new List<DeliveryState> { new DeliveryState { State = 1 } };     //  State 1 (pending) wordt toegevoegd aan de orderStates                                                   // 
+                    order.DeliveryStatus = "Pending";                                                       //  De Status van de order wordt gezet op "Pending" zodat de UI dit makkelijk kan tonen                     //
+                    Orders.Add(order);                                                                      //  De order wordt aan de Orders lijst toegevoegd zodat het op de UI getoond kan worden                     //
+                    addedCount++;                                                                           //  addedCount wordt verhoogd om bij te houden hoeveel orders we hebben toegevoegd in deze batch.           //
+                    Console.WriteLine($"Added Pending order {order.Id} (no delivery states)");              // Simpele debug-statement voor het toevoegen van een order zonder delivery states.                         //
+                }                                                                                           //                                                                                                          //
+                                                                                                            //                                                                                                          //
+                else if (statesForOrder.Count == 1 && statesForOrder[0].State == 1)                         //  Else-if statement voor als er precies 1 state is en als deze state 1 is (pending)                       //
+                {                                                                                           //                                                                                                          //
+                    order.DeliveryStatus = "Pending";                                                       //  Status wordt naar pending gezet zodat de UI dit makkelijk kan tonen                                     //
+                    Orders.Add(order);                                                                      //  De order wordt aan de Orders lijst toegevoegd zodat het op de UI getoond kan worden                     //
+                    addedCount++;                                                                           //  addedCount wordt verhoogd om bij te houden hoeveel orders we hebben toegevoegd in deze batch.           //
+                    Console.WriteLine($"Added Pending order {order.Id}");                                   //  Simpele debug-statement voor het toevoegen van een order met de pending state.                          //
+                }                                                                                           //                                                                                                          //
+                                                                                                            //                                                                                                          //
+                else                                                                                        //  Else statement voor als de rest niet gebeurt.                                                           //
+                {                                                                                           //                                                                                                          //
+                    Console.WriteLine($"Skipped order {order.Id} because of multiple delivery states.");    // Debug-statement.                                                                                         //
+                }                                                                                           //                                                                                                          //
+            }                                                                                               //                                                                                                          //
+            catch (Exception ex)                                                                            //  Catch statement voor als er iets fout gaat                                                              //
+            {                                                                                               //                                                                                                          //
+                Console.WriteLine($"Error loading order with ID {_currentId}: {ex.Message}");               // Debug-statement voor het tonen van de foutmelding bij het laden van een order.                           //
+                _currentId++;                                                                               //  _currentId wordt verhoogt om de volgende order op te halen in de volgende iteratie van de loop.         //
+            }                                                                                               //                                                                                                          //
+        }                                                                                                   //                                                                                                          //
+        IsLoading = false;                                                                                  //  IsLoading wordt op false gezet zodat we weten dat we klaar zijn met laden.                              //
+    }                                                                                                       //                                                                                                          //
+                                                                                                            //                                                                                                          //
+    private async Task StartDelivery(Order order)                                                           //  StartDelivery is een async functie die de levering van een order start.                                 //
+    {                                                                                                       //                                                                                                          //
+        if (order == null) return;                                                                          //  Als de order dat meegegeven is null dan returnt hij direct.                                             //
+                                                                                                            //                                                                                                          //
+        try                                                                                                 //  Try statement voor extra debugging                                                                      // 
+        {                                                                                                   //                                                                                                          //
+            var result = await _apiService.StartDelivery(order.Id);                                         //  Resultaat van de StartDelivery API-aanroep wordt opgeslagen in result.                                  //
+            if (result.IsSuccessStatusCode)                                                                 //  Als de API-aanroep succesvol is (statuscode 200) dan gaat hij verder met de volgende stappen:           //
+            {                                                                                               //                                                                                                          //
+                var updatedOrder = await _apiService.GetOrderByIdAsync(order.Id);                           //  De order wordt opnieuw opgehaald met de API om de laatste status te krijgen.                            //
+                ReplaceOrderInCollection(updatedOrder, "Shipping");                                         //  De order wordt geupdate in de Orders collectie met de nieuwe status "Shipping".                         //
+                order = updatedOrder;                                                                       //  order wordt bijgewerkt met de laatste versie van de order.                                              //
+            }                                                                                               //                                                                                                          //
+            else                                                                                            //  Else statement voor als er iets fout gaat bij de API-aanroep.                                           //
+            {                                                                                               //                                                                                                          //
+                Console.WriteLine($"Start delivery failed: {result.ReasonPhrase}");                         //  Simpele debug statement voor het tonen van de reden waarom de levering niet gestart kon worden.         //
+            }                                                                                               //                                                                                                          //
+        }                                                                                                   //                                                                                                          //
+        catch (Exception ex)                                                                                //  Catch statement voor als er iets fout gaat bij het starten van de levering.                             //
+        {                                                                                                   //                                                                                                          //
+            Console.WriteLine($"Fout bij starten levering: {ex.Message}");                                  //  Simple debug statement voor het tonen van de foutmelding bij het starten van de levering.               //
+        }                                                                                                   //                                                                                                          //
+        string address = "";                                                                                //  Lege address string wordt hier gedeclareerd om later te gebruiken.                                      //
+        try                                                                                                 //  Try statement voor extra debugging                                                                      //
+        {                                                                                                   //                                                                                                          //
+            address = order.Customer.Address;                                                               //  address wordt hier omgezet naar het adres van de klant van de order.                                    //
+                                                                                                            //                                                                                                          //
+            if (string.IsNullOrWhiteSpace(address))                                                         //  Als address leeg of null is, dan throwt hij een exception.                                              //
+            {                                                                                               //                                                                                                          //
+                throw new Exception("Customer.Address is empty or null.");                                  //  exception wordt gethrowd.                                                                               //
+            }                                                                                               //                                                                                                          //
+                                                                                                            //                                                                                                          //
+            Console.WriteLine($"Successfully got order address: {address}");                                //  Simple debug statement voor het tonen van het adres van de order.                                       //
+        }                                                                                                   //                                                                                                          //
+        catch (Exception e)                                                                                 //  Catch statement voor als er iets fout gaat bij het ophalen van het adres.                               //
+        {                                                                                                   //                                                                                                          //
+            address = "Nieuw Eyckholt 300, 6419 DJ Heerlen";                                                //  Fallback adres voor als alles fout gaat bij het ophalen van het adres.                                  //
+            Console.WriteLine($"Error encountered while getting address: {e.Message}. Using fallback]");    //  Simpele debug statement.                                                                                //
+        }                                                                                                   //                                                                                                          //
+                                                                                                            //                                                                                                          //
+        try                                                                                                 //  Try statement voor extra debugging.                                                                     //
+        {                                                                                                   //                                                                                                          //
+            string encodedAddress = Uri.EscapeDataString(address);                                          //  adres wordt ge-encode voor gebruik in de URL. Dit zorgt ervoor dat speciale karakters worden verwerkt.  //
+                                                                                                            //                                                                                                          //
+            var url = $"https://www.google.com/maps/search/?api=1&query={encodedAddress}";                  //  De url wordt hier opgebouwd met de ge-encodeerde adres. Dit opent Google Maps met het opgegeven adres //
+            Console.WriteLine($"Opening Google Maps to address: {url}");                                    //  Simpele debug statement voor het tonen van de URL die wordt geopend.                                    //
+                                                                                                            //                                                                                                          //
+            await Launcher.Default.OpenAsync(new Uri(url));                                                 //  hier wordt het openen van google maps geawait met de opgegeven URL.                                     //
+        }                                                                                                   //                                                                                                          //
+        catch (Exception ex)                                                                                // Catch statement voor als er iets fout gaat bij het openen van Google Maps.                               //
+        {                                                                                                   //                                                                                                          //
+            Console.WriteLine($"Failed to open Google Maps: {ex.Message}");                                 //  Simpele debug statement voor het tonen van de foutmelding bij het openen van Google Maps.               //
+        }                                                                                                   //                                                                                                          //
+    }                                                                                                       //                                                                                                          //
+                                                                                                            //                                                                                                          //
+    public async Task CompleteDelivery(Order order)                                                         //  CompleteDelivery functie die de levering van een order voltooit.                                        //
+    {                                                                                                       //  Het is een async functie zodat het tegelijk met andere processen kan runnen.                            //
+        if (order == null) return;                                                                          //  Als order null is dan returnt hij direct.                                                               //
+                                                                                                            //                                                                                                          //
+        try                                                                                                 //  Try statement voor extra debugging.                                                                     //                      
+        {                                                                                                   //                                                                                                          //
+            var result = await _apiService.CompleteDelivery(order.Id);                                      //  Hier wordt de CompleteDelivery API-aanroep gedaan met de order ID.                                      //
+            if (result.IsSuccessStatusCode)                                                                 //  Als de API-aanroep succesvol is (statuscode 200) dan gaat hij verder met de volgende stappen:           //
+            {                                                                                               //                                                                                                          //
+                var updatedOrder = await _apiService.GetOrderByIdAsync(order.Id);                           //  De order wordt opnieuw opgehaald met de API om de laatste status te krijgen.                            //
+                ReplaceOrderInCollection(updatedOrder, "Delivered");                                        //  De order wordt geupdate in de Orders collectie met de nieuwe status "Delivered".                        //
+            }                                                                                               //                                                                                                          //
+            else                                                                                            //  Else statement voor als er iets fout gaat bij de API-aanroep.                                           //
+            {                                                                                               //                                                                                                          //
+                Console.WriteLine($"Complete delivery failed: {result.ReasonPhrase}");                      //  Simpele debug statement voor het tonen van de reden waarom de levering niet voltooid kon worden.        //
+            }                                                                                               //                                                                                                          //
+        }                                                                                                   //                                                                                                          //
+        catch (Exception ex)                                                                                //  Catch statement voor als er iets fout gaat bij het voltooien van de levering.                           //
+        {                                                                                                   //                                                                                                          //
+            Console.WriteLine($"Fout bij voltooien levering: {ex.Message}");                                //  Simpele debug statement voor het tonen van de foutmelding bij het voltooien van de levering.            //
+        }                                                                                                   //                                                                                                          //
+    }                                                                                                       //                                                                                                          //
+                                                                                                            //                                                                                                          //
+    private void ReplaceOrderInCollection(Order updatedOrder, string _state)                                //  ReplaceOrderInCollection functie die een bestaande order in de collectie vervangt met een nieuwe versie.//
+    {                                                                                                       //                                                                                                          //
+        var existing = Orders.FirstOrDefault(o => o.Id == updatedOrder.Id);                                 //  Hier wordt de bestaande order opgehaald uit de Orders collectie op basis van de ID van de updatedOrder. //
+        if (existing != null)                                                                               //  Als de bestaande order niet null is, dan gaat hij verder met de volgende stappen:                       //
+        {                                                                                                   //                                                                                                          //
+            var index = Orders.IndexOf(existing);                                                           //  De index van de bestaande order wordt opgehaald uit de Orders collectie.                                //
+            updatedOrder.DeliveryStatus = _state;                                                           //  Hier wordt de DeliveryStatus van de updatedOrder aangepast met _state. (de nieuwe state)                //
+            Orders[index] = updatedOrder;                                                                   //  Hier wordt de bestaande order vervangen door de updatedOrder in de Orders collectie.                    //
+        }                                                                                                   //                                                                                                          //
+    }                                                                                                       //                                                                                                          //
+                                                                                                            //                                                                                                          //
+    public event PropertyChangedEventHandler? PropertyChanged;                                              // Event voor property changes (voor databinding)                                                           //
+    protected void OnPropertyChanged(string propertyName) =>                                                // Methode om het PropertyChanged event te triggeren                                                        //
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));                          // Notificeer listeners dat een property is veranderd                                                       //
+}                                                                                                           //                                                                                                          //

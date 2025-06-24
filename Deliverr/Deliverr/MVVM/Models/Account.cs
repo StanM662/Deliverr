@@ -1,5 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-namespace Deliverr.Models;
+﻿namespace Deliverr.Models;
 public partial class Account
 {
     public string Username { get; set; }
