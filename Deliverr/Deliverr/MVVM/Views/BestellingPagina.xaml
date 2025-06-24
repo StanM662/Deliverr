@@ -36,7 +36,12 @@
 
                                     <HorizontalStackLayout Spacing="5">
                                         <Label Text="Customer ID:" FontAttributes="Bold" />
-                                        <Label Text="{Binding CustomerId}" />
+                                        <Label Text="{Binding Customer.Name}" />
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="Address:" FontAttributes="Bold" />
+                                        <Label Text="{Binding Customer.Address}" />
                                     </HorizontalStackLayout>
 
                                     <HorizontalStackLayout Spacing="5">

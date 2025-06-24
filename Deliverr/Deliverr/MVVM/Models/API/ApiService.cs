@@ -59,8 +59,12 @@ public class ApiService                                                         
         string tab = $"/DeliveryStates/StartDelivery";                              //  Base endpoint voor de API, dit is de tab waar het proces plaatsvindt.                       //
         string func = $"?OrderId={orderId}";                                        //  Het Order ID van het specifieke order dat geladen moet worden.                              //
         string endpoint = $"api{tab}{func}";                                        //  Alles samengevoegd tot een endpoint string. Dit wordt gebruikt om de verbinding te maken    //
-        var content = new StringContent("{}", Encoding.UTF8, "application/json");   //  Lege JSON string, dit is nodig omdat de API geen "null" accepteerd als JSON body.           //
-        var response = await _httpClient.PostAsync(endpoint, content);              //  Het antwoord van de API wordt opgeslagen in de response variabele.                          //
+        var emptyBody = new StringContent("{}", Encoding.UTF8, "application/json");
+        Console.WriteLine($"Posting to {endpoint}");
+        var response = await _httpClient.PostAsync(endpoint, emptyBody);
+                      //  Lege JSON string, dit is nodig omdat de API geen "null" accepteerd als JSON body.           //
+                      //  Het antwoord van de API wordt opgeslagen in de response variabele.                          //
+        
         response.EnsureSuccessStatusCode();                                         //  Hier wordt gecontroleerd of de response een succesvolle statuscode heeft.                   //
         var responseBody = await response.Content.ReadAsStringAsync();              //  Hier wordt de body van de response gelezen als een string.                                  //
         Console.WriteLine($"Status: {response.StatusCode}");                        //  Statuscode wordt in de console weergegeven voor debugging.                                  //

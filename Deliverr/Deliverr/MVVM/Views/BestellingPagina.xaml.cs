@@ -8,12 +8,13 @@ namespace Deliverr
     {
         private BestellingenViewModel vm;
         private ApiService _apiService = new ApiService();
-
+        private bool ordersLoaded = false;
         public BestellingPagina()
         {
             InitializeComponent();
             vm = new BestellingenViewModel();
             BindingContext = vm;
+            
         }
 
         protected override async void OnAppearing()
@@ -32,42 +33,56 @@ namespace Deliverr
                 }
             });
 
-            await vm.LoadInitialOrders();
+            if (ordersLoaded == false)
+            {
+                await vm.LoadInitialOrders(20);
+                ordersLoaded = true;
+            }
         }
 
         private async void OnCompleteClicked(object sender, EventArgs e)
         {
             var button = sender as Button;
             if (button?.BindingContext is not Order order) return;
-
-            try
+            if (order.DeliveryStates.Count == 2)
             {
-                // 1. Foto maken
-                var foto = await MediaPicker.CapturePhotoAsync();
-                if (foto == null)
+                try
                 {
-                    await DisplayAlert("Fout", "Je moet een foto maken om te kunnen voltooien.", "OK");
-                    return;
+                    // 1. Foto maken
+                    var foto = await MediaPicker.CapturePhotoAsync();
+                    if (foto == null)
+                    {
+                        await DisplayAlert("Fout", "Je moet een foto maken om te kunnen voltooien.", "OK");
+                        return;
+                    }
+
+                    var stream = await foto.OpenReadAsync();
+
+                    // 2. Navigeer naar CompletePagina met order en fotoStream (zonder update)
+                    var completePagina = new CompletePagina();
+                    completePagina.InitializeWithData(order, stream);
+
+                    // Navigeer en wacht op resultaat (bool) via TaskCompletionSource of MessagingCenter (hier eenvoudig via await PushAsync)
+                    await Navigation.PushAsync(completePagina);
+
+                    // Eventueel: refresh orders als update succesvol was in CompletePagina (zie daar)
+
                 }
-
-                var stream = await foto.OpenReadAsync();
-
-                // 2. Navigeer naar CompletePagina met order en fotoStream (zonder update)
-                var completePagina = new CompletePagina();
-                completePagina.InitializeWithData(order, stream);
-
-                // Navigeer en wacht op resultaat (bool) via TaskCompletionSource of MessagingCenter (hier eenvoudig via await PushAsync)
-                await Navigation.PushAsync(completePagina);
-
-                // Eventueel: refresh orders als update succesvol was in CompletePagina (zie daar)
-
+                catch (Exception ex)
+                {
+                    await DisplayAlert("Fout", "Er is een fout opgetreden: " + ex.Message, "OK");
+                }
             }
-            catch (Exception ex)
+
+            else if (order.DeliveryStates.Count == 1)
             {
-                await DisplayAlert("Fout", "Er is een fout opgetreden: " + ex.Message, "OK");
+                await DisplayAlert("Fout", "Er is een fout opgetreden: " + "Je order is nog niet gestart", "OK");
+            }
+
+            else if (order.DeliveryStates.Count == 3)
+            {
+                await DisplayAlert("Fout", "Er is een fout opgetreden: " + "Je order is al voltooid", "OK");
             }
         }
-
-
     }
 }

@@ -1,10 +1,18 @@
-﻿using Deliverr.Models;
-namespace Deliverr.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-public partial class Customer
+namespace Deliverr.Models
 {
-    public int id;
-    public string name;
-    public string adress;
-    public bool active;
+    public partial class Customer
+    {
+        [Required]
+        public int Id { get; set; }
+
+        [Required]
+        public string Name { get; set; } = "";
+
+        [Required]
+        public string Address { get; set; } = "";
+
+        public bool Active { get; set; }
+    }
 }

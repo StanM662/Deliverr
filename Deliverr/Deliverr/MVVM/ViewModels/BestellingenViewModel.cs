@@ -45,85 +45,69 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
     {
         StartDeliveryCommand = new Command<Order>(async order => await StartDelivery(order));
         CompleteDeliveryCommand = new Command<Order>(async order => await CompleteDelivery(order));
-        LoadMoreOrdersCommand = new Command(async () => await LoadNextOrders());
+        LoadMoreOrdersCommand = new Command(async () => await LoadNextOrders(20));
     }
 
-    public async Task LoadInitialOrders()
+    public async Task LoadInitialOrders(int orderCap)
     {
-        await LoadNextOrders(); 
+        await LoadNextOrders(orderCap); 
     }
 
-    private async Task LoadNextOrders()
+    private async Task LoadNextOrders(int batchSize)
     {
         if (IsLoading) return;
 
         IsLoading = true;
+        int addedCount = 0;
 
-        for (int i = 0; i < 20; i++)
+        while (addedCount < batchSize)
         {
             try
             {
                 var order = await _apiService.GetOrderByIdAsync(_currentId);
-                if (order != null)
+                _currentId++;  // increment regardless of success or failure to avoid infinite loop
+
+                if (order == null)
                 {
-                    // Set default state or delivery status
+                    // No order found for this ID, skip
+                    continue;
+                }
+
+                var statesForOrder = order.DeliveryStates ?? new List<DeliveryState>();
+
+                if (!statesForOrder.Any())
+                {
+                    // No states found - consider it Pending
                     order.DeliveryStates = new List<DeliveryState> { new DeliveryState { State = 1 } };
                     order.DeliveryStatus = "Pending";
                     Orders.Add(order);
+                    addedCount++;
+                    Console.WriteLine($"Added Pending order {order.Id} (no delivery states)");
+                }
+                else if (statesForOrder.Count == 1 && statesForOrder[0].State == 1)
+                {
+                    // Exactly one delivery state and it is Pending
+                    order.DeliveryStatus = "Pending";
+                    Orders.Add(order);
+                    addedCount++;
+                    Console.WriteLine($"Added Pending order {order.Id}");
+                }
+                else
+                {
+                    // Skip orders with multiple states or non-pending states
+                    Console.WriteLine($"Skipped order {order.Id} with delivery states count: {statesForOrder.Count} or non-pending state.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Order with ID {_currentId} not found or error: {ex.Message}");
+                Console.WriteLine($"Error loading order with ID {_currentId}: {ex.Message}");
+                _currentId++; // increment anyway to avoid infinite loop on failure
             }
-
-            _currentId++;
         }
 
         IsLoading = false;
     }
-    public async Task LoadOrdersAsync()
-    {
-        if (Orders.Count >= 1)
-        {
-            return;
-        }
-        else
-        {
-            IsLoading = true;
-            var ordersTask = _apiService.GetOrdersAsync();
-            var statesTask = _apiService.GetDeliveryStatesAsync();
-
-            await Task.WhenAll(ordersTask, statesTask);
-
-            var orderList = ordersTask.Result;
-            var stateList = statesTask.Result;
-
-            for (int i = 0; i < orderList.Count; i++)
-            {
-                var order = orderList[i];
-                DeliveryState? state = i < stateList.Count ? stateList[i] : null;
-                order.DeliveryStates = new List<DeliveryState>();
-                if (state != null)
-                {
-                    order.DeliveryStates.Add(state);
-                }
-                else
-                {
-                    DeliveryState ds = new DeliveryState { State = 1 };
-                    order.DeliveryStates.Add(ds);
-                    string _state = "Pending";
-                    order.DeliveryStatus = _state;
-                    Orders.Add(order);
-                }
-
-            }
-            IsLoading = false;
-        }
-    }
-
-
-
+    
     private async Task StartDelivery(Order order)
     {
         if (order == null) return;
@@ -135,6 +119,7 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
             {
                 var updatedOrder = await _apiService.GetOrderByIdAsync(order.Id);
                 ReplaceOrderInCollection(updatedOrder, "Shipping");
+                order = updatedOrder;
             }
             else
             {
@@ -145,7 +130,42 @@ public class BestellingenViewModel : INotifyPropertyChanged                     
         {
             Console.WriteLine($"Fout bij starten levering: {ex.Message}");
         }
+
+        // ✅ Try to get the address
+        string address = "";
+        try
+        {
+            address = order.Customer.Address;
+
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                throw new Exception("Customer.Address is empty or null.");
+            }
+
+            Console.WriteLine($"Successfully got order address: {address}");
+        }
+        catch (Exception e)
+        {
+            // Fallback address if something goes wrong
+            address = "Nieuw Eyckholt 300, 6419 DJ Heerlen";
+            Console.WriteLine($"Error encountered while getting address: {e.Message}. Using fallback: {address}");
+        }
+
+        // ✅ Launch Google Maps
+        try
+        {
+            string encodedAddress = Uri.EscapeDataString(address);
+            var url = $"https://www.google.com/maps/search/?api=1&query={encodedAddress}";
+            Console.WriteLine($"Opening Google Maps to address: {url}");
+
+            await Launcher.Default.OpenAsync(new Uri(url));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to open Google Maps: {ex.Message}");
+        }
     }
+
 
     public async Task CompleteDelivery(Order order)
     {
