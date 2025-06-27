@@ -25,4 +25,6 @@ Developed for the couriers of Matrix Inc.
 
 - Sander Kleijnen
 - Stan Morreau
-- (Rick Theunisz)
+
+
+https://github.com/StanM662/Deliverr
