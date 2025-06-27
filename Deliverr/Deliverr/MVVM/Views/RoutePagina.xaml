@@ -7,17 +7,13 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
 
-            <Label Text="Route" FontAttributes="Bold" FontSize="24" HorizontalOptions="Center" />
+            <Label Text="Starting address" />
+            <Entry x:Name="StartEntry" Placeholder="Bijv. Nieuw Eyckholt 300, 6419 DJ Heerlen" />
 
-            <Label Text="Start (lat, lon)" />
-            <Entry x:Name="StartEntry" Placeholder="e.g. 50.891010, 5.739933" />
+            <Label Text="Destination address" />
+            <Entry x:Name="EndEntry" Placeholder="Bijv. Kerkstraat 10, 1234 AB Maastricht" />
 
-            <Label Text="Destination (lat, lon)" />
-            <Entry x:Name="EndEntry" Placeholder="e.g. 50.881990, 5.959734" />
-
-            <Button Text="Toon Route" Clicked="OnToonRouteClicked" />
-
-            <WebView x:Name="KaartView" HeightRequest="400" />
+            <Button Text="Calculate Route" Clicked="OnToonRouteClicked" />
 
         </VerticalStackLayout>
     </ScrollView>
